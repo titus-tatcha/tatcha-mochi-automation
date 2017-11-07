@@ -31,7 +31,7 @@
 	               <version>2.20</version>
 	               <configuration>
 	                   <includes>	
- 						    <include>com/litmus7/tatcha/jscripts/selenium/TsignUp*.java</include> 					    
+ 						    <include>com/litmus7/tatcha/jscripts/selenium/gheader/Tcheck*.java</include> 					    
 	                   </includes>
 	                   <systemPropertyVariables>
 	                       <!-- Relocate the XLT results directory under target. -->
