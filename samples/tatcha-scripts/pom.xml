@@ -51,6 +51,7 @@
  						   		<include>com/litmus7/tatcha/jscripts/selenium/navigation/GlobalNavigation_HeaderLinks_MOC_33.java</include>	
  						        <include>com/litmus7/tatcha/jscripts/selenium/navigation/GlobalNavigation_FooterLinks_MOC_39.java</include>		 		   		
  				-->	 
+ 				
  				<!-- Sprint 4 -->						    
 				   	  			<include>com/litmus7/tatcha/jscripts/selenium/bags/AddToCartGuest.java</include>	
 		      
