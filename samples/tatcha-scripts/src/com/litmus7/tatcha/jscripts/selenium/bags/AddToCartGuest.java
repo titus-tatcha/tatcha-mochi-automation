@@ -5,7 +5,10 @@ import java.util.regex.Pattern;
 import javax.activity.InvalidActivityException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -18,7 +21,9 @@ import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.litmus7.tatcha.jscripts.dob.Product;
+import com.litmus7.tatcha.jscripts.selenium.exception.CharacterLengthExceededException;
 import com.litmus7.tatcha.jscripts.selenium.exception.InvalidElementException;
+import com.litmus7.tatcha.jscripts.selenium.exception.ProductNotFoundException;
 import com.litmus7.tatcha.utils.BrowserDriver;
 
 public class AddToCartGuest {
@@ -44,61 +49,48 @@ public class AddToCartGuest {
   public void testAddToCartGuest() throws Exception {
 //    driver.get(baseUrl + "/on/demandware.store/Sites-tatcha-Site/default/Login-Show?original=%2fs%2ftatcha%2faccount%3flang%3ddefault");
     driver.get(baseUrl);
-
+    Product product = new Product();
+    
     /**  ------------ Adding Products to Mini Cart ------------ */
 	Actions action = new Actions(driver);
 	int prodCount = 3;
 	
 	ArrayList<String> productNames = new ArrayList<String>();
-	productNames.add("Camellia Beauty Oil");
-	productNames.add("Yume Kimono Cuff - Gold");
-	productNames.add("The Brightening Set");
+//	productNames.add("Camellia Beauty Oil");
+//	productNames.add("Yume Kimono Cuff - Gold");
+//	productNames.add("The Brightening Set");
+	productNames.add("Once Step Camellia Cleansing Oil");
 	
 	 WebDriverWait wait = (WebDriverWait) new WebDriverWait(driver, 3);
 	for(String productName: productNames){	
-		wait.until(ExpectedConditions.visibilityOfElementLocated((By.linkText("SHOP"))));
-		try{
-			WebElement element = driver.findElement(By.linkText("SHOP"));
-		    action.moveToElement(element).build().perform();
-		    driver.findElement(By.linkText("Shop All")).click();
-		    /** now only the first page items are selected since PROD page not in this sprint */
-		    
-		    driver.findElement(By.cssSelector("img[alt=\""+productName+"\"]")).click();
-		    
-		    // going to PDP
-		    Product product = new Product();
+		
+		/** Find product by hovering shop all - works only for Page one */
+		
+//		wait.until(ExpectedConditions.visibilityOfElementLocated((By.linkText("SHOP"))));
+//		try{
+//			WebElement element = driver.findElement(By.linkText("SHOP"));
+//		    action.moveToElement(element).build().perform();
+//		    driver.findElement(By.linkText("Shop All")).click();
+//		    /** now only the first page items are selected since PROD page not in this sprint */
+//		    
+//		    driver.findElement(By.cssSelector("img[alt=\""+productName+"\"]")).click();
+//		    		    
+//		}catch(NoSuchElementException ne){
+//			System.err.println("No Element >> "+ne.toString());
+//			searchProduct(driver,productName);
+//		}
+		
+		/** Find product by Search Filter */
+			searchProduct(driver,productName);
+	    
+		// going to PDP
 		    product.setPid("P"+(productId++));
 		    product.setName(productName);
 		    testPDPforGuest(driver, product);
 		    testBAGforGuest(driver,prodList);
-
-		    /** PREV CODE */
-//		    /** Getting Price */
-//		    String productPrice = driver.findElement(By.xpath("//*[@id='product-content']/div[2]/div/div[1]/span")).getText();
-//		    System.out.println("productPrice "+productPrice);
-//		    /** Getting Quantity */
-//		    Select dropdown = new Select(driver.findElement(By.id("Quantity")));
-//		    dropdown.selectByVisibleText("1");
-//		    
-//		    /** Calculating Subtotal */
-//		    String amount = productPrice.trim().substring(1);
-//		    System.out.println("amount "+amount);
-//		    subTotal += Double.parseDouble(amount);
-//		    
-//		    /** Creating Product Object */
-//		    Product product = new Product();
-//		    product.setPid("P"+(productId++));
-//		    product.setName(productName);
-//		    product.setPrice(productPrice);
-//		    prodList.add(product);
-//		    driver.findElement(By.id("add-to-cart")).click();
-		    
-		}catch(NoSuchElementException ne){
-			System.err.println("No Element >> "+ne.toString());
-		}
 	}
 	
-    // Mini Cart item count
+    // Mini Cart item count 
     String itemCount = driver.findElement(By.cssSelector("div.badge.bag-count")).getText();
     assertEquals(prodCount, itemCount+"");
    
@@ -108,32 +100,12 @@ public class AddToCartGuest {
     
     System.out.println("subTotal "+subTotal);
 	
-//	#mini-cart > div.mini-cart-total > a > svg
-	
-// 	    #cd2a1eba3cb9a2e22ac2ef1082 > div.product-price > span.product-sales-price
-
-//    driver.findElement(By.cssSelector("img[alt=\"Kissed with Gold Set\"]")).click();
-//    driver.findElement(By.id("add-to-cart")).click();
-//    
-//    driver.findElement(By.linkText("Shop All")).click();
-//    driver.findElement(By.cssSelector("a.thumb-link > img[alt=\"Soothing Silk Hand Cream\"]")).click();
-//    driver.findElement(By.id("add-to-cart")).click();
-//    
-//    driver.findElement(By.cssSelector("div.badge.bag-count")).click();
-//    
-//    driver.findElement(By.linkText("Shop All")).click();
-//    driver.findElement(By.cssSelector("img[alt=\"The Essence\"]")).click();
-//    driver.findElement(By.id("add-to-cart")).click();
-//    
     /** ----------------------- Mini Cart Checkings ------------------- */
     // checking items
-	
-//	for(String imageName: imageNames){	
-    
-    
+
     int cartItem = 1;
     prodList.size();
-	for(Product product: prodList){	
+	for(Product prod: prodList){	
 		try{	   
 			/** Hovering over mini cart*/
 			By byeEle = By.xpath("//*[@id='mini-cart']/div[1]/a");
@@ -149,9 +121,9 @@ public class AddToCartGuest {
 		    String productNamePDP = driver.findElement(By.xpath("//*[@id='product-content']/div[2]/h1")).getText();
 		    String productPricePDP = driver.findElement(By.xpath("//*[@id='product-content']/div[2]/div/div[1]/span")).getText();
 		    
-		    if(prodEqualList.contains(product)){
-				assertEquals(product.getName(),productNamePDP);
-				assertEquals(product.getPrice(),productPricePDP);
+		    if(prodEqualList.contains(prod)){
+				assertEquals(prod.getName(),productNamePDP);
+				assertEquals(prod.getPrice(),productPricePDP);
 		    }
 						
 //		    assertEquals("Qty: 1 | $85.50", driver.findElement(By.cssSelector("div.dropdown-bag-item-qty-price")).getText());
@@ -161,41 +133,48 @@ public class AddToCartGuest {
 		}
 			
 	}
-	
-//    assertEquals("The Essence", driver.findElement(By.linkText("The Essence")).getText());
-//    assertEquals("Qty:", driver.findElement(By.cssSelector("span.data-label")).getText());
-//    assertEquals("Qty: 1 | $85.50", driver.findElement(By.cssSelector("div.dropdown-bag-item-qty-price")).getText());
-//    
-//    assertEquals("", driver.findElement(By.cssSelector("img.dropdown-bag-item-img-small")).getText());
-//    driver.findElement(By.linkText("The Essence")).click();
-//    // next item
-//    assertEquals("", driver.findElement(By.xpath("//img[@alt='Kissed with Gold Set']")).getText());
-//    assertEquals("Kissed with Gold Set", driver.findElement(By.linkText("Kissed with Gold Set")).getText());
-//    assertEquals("Qty:", driver.findElement(By.xpath("//div[@id='mini-cart']/div[2]/div[2]/div[2]/div[2]/div/span")).getText());
-//    assertEquals("Qty: 1 | $42.00", driver.findElement(By.xpath("//div[@id='mini-cart']/div[2]/div[2]/div[2]/div[2]/div")).getText());
-//    driver.findElement(By.linkText("Kissed with Gold Set")).click();
-    
-    // cart page
-//    assertEquals("4 Item(s) | Subtotal: $194.50", driver.findElement(By.cssSelector("div.dropdown-bag-totals.mini-cart-totals")).getText());
-    // CTA Select Free Sample
+
     driver.findElement(By.linkText("Select Free Samples")).click();
     assertEquals("SHOPPING BAG", driver.findElement(By.cssSelector("h1")).getText());
+    
     // CTA Checkout
-    driver.findElement(By.linkText("Checkout")).click();
+    checkoutLogin(driver,product);
+//    driver.findElement(By.linkText("Checkout")).click();
     assertEquals("Select an Address", driver.findElement(By.cssSelector("div.select-address.form-row > label")).getText());
     // click to Bag Page
     // ERROR: Caught exception [Error: locator strategy either id or name must be specified explicitly.]
   }
 
+  /** Search Filter 
+ * @throws ProductNotFoundException */
+  private void searchProduct(WebDriver driver,String productName) throws ProductNotFoundException{
+	  try{
+	    WebElement searchEle = driver.findElement(By.xpath("//*[@id='q']"));
+	    searchEle.sendKeys(productName);
+	    searchEle.sendKeys(Keys.RETURN);
+//	    searchEle.sendKeys(Keys.ENTER);
+	    
+//	    WebElement.sendKeys(Keys.RETURN);
+//	    WebElement searchBtn = driver.findElement(By.xpath("//*[@id='navigation']/ul[2]/li[1]/form/div/span/svg"));
+//	    searchBtn.click();
+	  }catch(NoSuchElementException ne){
+		  throw new ProductNotFoundException("Product not found");
+	  }
+  }
+  
   /** Checking PDP in detail 
- * @throws InvalidElementException */
-  private void testPDPforGuest(WebDriver driver,Product product) throws InvalidElementException{
+ * @throws InvalidElementException 
+ * @throws CharacterLengthExceededException */
+  private void testPDPforGuest(WebDriver driver,Product product) throws InvalidElementException, CharacterLengthExceededException{
 	    
 	  // Marketing Flags
 	  
+	  try{
 	    String[] marketingFlags = { "New", "Bestseller", "Limited Edition", "Exclusive" };
 	    WebElement flag1Ele1 = driver.findElement(By.cssSelector("div.product-summary-desktop > div.product-marketing-flag-block > span.product-marketing-flag"));
 	    String marketFlag1 = flag1Ele1.getText().trim();
+	  //*[@id="pdpMain"]/div[1]/div[1]/div/span[1]
+	  //*[@id="pdpMain"]/div[1]/div[1]/div/span[3]
 	    WebElement flag1Ele2 = driver.findElement(By.xpath("//div[@id='product-content']/div[2]/div/span[3]"));
 	    String marketFlag2 = flag1Ele2.getText().trim();
 	    
@@ -238,31 +217,39 @@ public class AddToCartGuest {
 	    	throw new InvalidElementException("Marketing Flag 2 is invalid");
 	    }
 	    
-	    
+	  }catch(NoSuchElementException ne){
+		  /** No marketing banner */
+		  System.out.println(" No Marketing Banner !!! ");
+	  }
+	  
 	    // Product Title
-//	    assertEquals("One Step Camellia Cleansing Oil Tatcha", driver.findElement(By.cssSelector("div.product-summary-desktop > h1.product-name")).getText());
 	    WebElement prodTitleEle = driver.findElement(By.cssSelector("div.product-summary-desktop > h1.product-name"));
 	    String prodTitle = prodTitleEle.getText().toLowerCase();
-	    // checking product name same
 	    assert(prodTitle.contains(product.getName().toLowerCase()));  
 
-	    // Subtitlel
-	    WebElement prodsubtitleEle = driver.findElement(By.cssSelector("div.product-summary-desktop > h1.product-name > span.product-subtitle"));
-	    product.setSubtitle(prodsubtitleEle.getText());
+	    // Subtitle
+	    try{
+		    WebElement prodsubtitleEle = driver.findElement(By.cssSelector("div.product-summary-desktop > h1.product-name > span.product-subtitle"));
+		    product.setSubtitle(prodsubtitleEle.getText());
+	    }catch (NoSuchElementException ne) {
+			  System.out.println(" No Subtitle !!! ");
+			// TODO: handle exception
+		}
 //	    assertEquals(product.getSubtitle().toLowerCase(), prodsubtitleEle.getText().toLowerCase()); 
 //	    assertEquals("Tatcha", driver.findElement(By.cssSelector("div.product-summary-desktop > h1.product-name > span.product-subtitle")).getText());
 	   	  
-//	    product-price
-//	    #product-content > div.product-summary-desktop > div > div.product-price > span
-	  //*[@id="product-content"]/div[2]/div/div[1]/span
-//	    .//*[@id='product-content']/div[2]/div/div[1]/span
-	    
-	    String productPrice = driver.findElement(By.xpath("//*[@id='product-content']/div[2]/div/div[1]/span")).getText();
-	    product.setPrice(productPrice);
-	    
-	    // Product Price ( can be in a range $15.00 - $45.00)
-	//    assertEquals("$45.00", driver.findElement(By.cssSelector("div.product-summary-desktop > div.product-price-block > div.product-price > span.price-sales")).getText());
-	   	      
+//	    Product Price
+	    String productPrice = driver.findElement(By.xpath("//*[@id='product-content']/div[3]/div/div[1]/div")).getText();
+	    if(productPrice.contains("-")){ // $15.00 - $45.00
+	    	String lowPrice = productPrice.substring(0, productPrice.indexOf("-"));
+	    	String highPrice = productPrice.substring(productPrice.indexOf("-"),productPrice.length());
+	    	product.setHighPrice(highPrice.trim());
+	    	product.setLowPrice(lowPrice.trim());
+	    }else{
+//		    String productPrice = driver.findElement(By.xpath("//*[@id='product-content']/div[2]/div/div[1]/span")).getText();	
+	    	product.setPrice(productPrice);
+	    }
+	       	      
 //	    Skin Type
 	    //*[@id='product-content']/div[3]/div[1]/div[2]/div/div/div/div/div[1]/a
 	    //*[@id='product-content']/div[3]/div[1]/div[2]/div/div/div/div/div[2]/a
@@ -272,7 +259,8 @@ public class AddToCartGuest {
 	    boolean skinValidity = false;
 	    try{
 		    String[] skinVariants = {"Normal","Combination","Dry","Sensitive","Oily"};
-	    	WebElement skinTitle = driver.findElement(By.xpath("//*[@id='product-content']/div[3]/div[1]/div[1]"));
+	    	WebElement skinTitle = driver.findElement(By.xpath("//*[@id='product-content']/div[4]/div[2]/div[1]"));
+	    	
     		if(null != skinTitle.getText() && "size".equalsIgnoreCase(skinTitle.getText())){
     			
 			    for(int i=1;i<5;i++){
@@ -291,6 +279,10 @@ public class AddToCartGuest {
 	    	skinValidity = true;
 	    }
 	    
+//		   Size 
+		    //*[@id='product-content']/div[3]/div[2]/div[2]/div/div/div/div/div[1]/a
+		    //*[@id='product-content']/div[3]/div[2]/div[2]/div/div/div/div/div[2]/a	   	
+   
 	    boolean sizeValidity = false;
 	    try{
 		    	String[] sizeVariants = {"60g / 2.1 oz.", "10g / .35 oz."};
@@ -313,17 +305,6 @@ public class AddToCartGuest {
 	    	sizeValidity = true;
 	    }
 
-	  //*[@id="product-content"]/div[3]/div[2]/div[1]
-//	    #product-content > div.product-variations > div:nth-child(2) > div.form-label
-	    
-	    // Product Variants (Size only now seen) Optional
-
-	  
-//	   Size 
-	    //*[@id='product-content']/div[3]/div[2]/div[2]/div/div/div/div/div[1]/a
-	    //*[@id='product-content']/div[3]/div[2]/div[2]/div/div/div/div/div[2]/a	   
-		
-
 	    /** Raising Invalid Skin & Size Variants as Exceptions */
 	    
 	    if(!skinValidity){
@@ -332,13 +313,8 @@ public class AddToCartGuest {
 	    if(!sizeValidity){
 	    	throw new InvalidElementException("Size Variant is invalid");
 	    } 
-	    
-//	    assertEquals("60g / 2.1 oz.", .getText());
-//	    assertEquals("10g / .35 oz.", driver.findElement(By.linkText("10g / .35 oz.")).getText());
-//	    assertEquals("60g / 2.1 oz.", driver.findElement(By.linkText("60g / 2.1 oz.")).getText());
-	    
-	    // Quantity Fields
-	    
+	       
+	    // Quantity Notification Msg
 	    boolean notifyQty = false;	
 	    try{
 		    String notifyMessage = "Only A Few Left";
@@ -348,21 +324,29 @@ public class AddToCartGuest {
 		    if(notifyMessage.toLowerCase().equals(notifyMsg.toLowerCase())){
 		    	notifyQty = true;
 		    }
+		    
+		  //*[@id="dwfrm_product_addtocart_d0rpopaqcraa"]/fieldset/div/div[2]/div/h2
+		    
 		 }catch(NoSuchElementException ne){
 	    	notifyQty = true;
 	    }
-	    
+	 
+	  // Throw exception if quantity notify msg is invalid
 	    if(!notifyQty){
 	    	throw new InvalidElementException("Quantity Notification Message is invalid");
 	    }  
+	    	    
+	  // Quantity DDL 
+	    try{
+		    Select dropdown = new Select(driver.findElement(By.id("Quantity")));
+		    dropdown.selectByVisibleText("1");
+//		    dropdown.selectByIndex(2);
+//		    assertEquals("1 2 3 4 5", driver.findElement(By.id("Quantity")).getText());
+	    }catch(NoSuchElementException ne){
+	    	System.out.println("Quantity DDL not Present: "+ne.toString());
+	    }
 	    
-	    /** Getting Quantity DDL */
-	    Select dropdown = new Select(driver.findElement(By.id("Quantity")));
-	    dropdown.selectByVisibleText("1");
-//	    dropdown.selectByIndex(2);
-	    
-//	    assertEquals("1 2 3 4 5", driver.findElement(By.id("Quantity")).getText());
-	    
+	 // Limit Quantity Message
 	    boolean limitMessageValidity = false;
 	    try{
 		    String[] limitQuantityMsgs = {"Limit 1 per household.","Limit 3 per household."};	    
@@ -377,27 +361,47 @@ public class AddToCartGuest {
 	    	limitMessageValidity = true;
 	    }
 	    
+	    // Throw exception if limit quantity msg is invalid
 	    if(!limitMessageValidity){
 	    	throw new InvalidElementException("Limit Quantity Message is invalid");
 	    }  
 	    
 	    /** Calculating Subtotal */
-	    String amount = productPrice.trim().substring(1);
-	    System.out.println("amount "+amount);
-	    subTotal += Double.parseDouble(amount);
-	    
+	    if(productPrice.contains("-")){
+	    	
+	    }else{
+		    String amount = productPrice.trim().substring(1);
+		    System.out.println("amount "+amount);
+		    subTotal += Double.parseDouble(amount);
+	    }
+
 	    /** Updating Product Object */
-	    product.setPrice(productPrice);
+//	    product.setPrice(productPrice);
 	    prodList.add(product);
 	    
-	    /** Adding Product to Mini Cart*/
-	    driver.findElement(By.id("add-to-cart")).click();
+	    // ADD-TO-CART // SOLD-OUT // COMMING-SOON
+	    
+	    try{
+		    /** Adding Product to Mini Cart*/
+		    driver.findElement(By.id("add-to-cart")).click();
+	    }catch(NoSuchElementException ne){
+			//*[@id="dwfrm_product_addtocart_d0wihrksaygc"]/fieldset/div/div[2]/div/h2
+//	    	driver.findElement(By.id("add-to-cart")).click();
+	    	System.out.println(" SOLD OUT or COMMING SOON ");
+	    }
 	    
 	    // Reviews
 //	    assertEquals("9,999 Reviews", driver.findElement(By.cssSelector("div.product-summary-desktop > div.product-price-block > div.product-rating-summary > a.tatcha-animation.")).getText());
-	    WebElement reviewEle = driver.findElement(By.xpath("//*[@id='product-content']/div[2]/div[2]/div[2]/a"));
-	    String reviews  = reviewEle.getText();
-	    assertEquals("9,999 Reviews",reviews);
+	    try{
+//		    WebElement reviewEle = driver.findElement(By.xpath("//*[@id='product-content']/div[2]/div[2]/div[2]/a"));
+	    	WebElement reviewEle = driver.findElement(By.xpath("//*[@id='product-content']/div[3]/div/div[2]/div/a"));
+		    String reviews  = reviewEle.getText();
+		    assertEquals("9,999 Reviews",reviews);
+	
+	    }catch(NoSuchElementException ne){
+//	    	imgValidity = false;
+	    	throw ne;
+	    }
 	    
 	    // Main Image & Thumbnails
 //	    boolean imgValidity = false;
@@ -416,7 +420,293 @@ public class AddToCartGuest {
 //	    driver.findElement(By.xpath("(//img[@alt='One Step Camellia Cleansing Oil'])[3]")).click();
 //	    assertEquals("", driver.findElement(By.cssSelector("img.primary-image.img-responsive")).getText());
 //	    driver.findElement(By.cssSelector("img.productthumbnail")).click(); 	    
-}
+	       
+	    /** Testing Sprint 5 stories - 203,204,205,206,207,208,211 */
+	    testRecommendedFor(driver,product);
+	    testWhatItis(driver,product);
+	    testWhyItWorks(driver,product);
+	    testIngredient(driver,product);
+	    testHadasei(driver,product);
+	    testHowToUse(driver,product);
+	    testPurityPromise(driver,product);
+  }
+  
+  /** MOC 190 */
+  private void checkoutLogin(WebDriver driver,Product product){
+	  String CL_TITLE = "WELCOME, FRIEND!";
+	  String CL_DESC = "We would like to send you a receipt and confirmation. "
+	  		+ "If there is a Tatcha account with that address, "
+	  		+ "you will be asked for the password.";
+	  String EMAIL_LABEL = "EMAIL";
+	  String EMAIL = "qa.tatcha@gmail.com"; // from user object
+	  String EMAIL_PLACEHOLDER = "beautiful@tatcha.com";
+	  String OR_FB_LABEL = "Or login/register with Facebook.";
+	  
+	  driver.findElement(By.linkText("Checkout")).click();
+			  
+	  WebElement chkLoginTitle = driver.findElement(By.xpath("/html/body/main/div/h1"));
+	  assertEquals(CL_TITLE, chkLoginTitle.getText());
+	  WebElement chkLoginDesc = driver.findElement(By.xpath("/html/body/main/div/div[1]/div[1]/div/p"));
+	  assertEquals(CL_TITLE, chkLoginDesc.getText());	  
+	  WebElement email_label = driver.findElement(By.xpath("/html/body/main/div/div[1]/div[2]/div/form/div/label"));
+	  assertEquals(EMAIL_LABEL, email_label.getText());	 
+	  WebElement email = driver.findElement(By.xpath("//*[@id='email']"));
+	  assertEquals(EMAIL, email.getText());	  
+	  
+	  WebElement email_placeholder = driver.findElement(By.xpath("//input[contains(@id,'email') && ('placeholder','beautiful@tatcha.com')]"));
+	// <input id="email" placeholder="beautiful@tatcha.com">
+	  
+	// Or
+	 WebElement or_fb_lbl = driver.findElement(By.xpath("/html/body/main/div/div[1]/div[2]/div/div[2]/p"));
+	 assertEquals(OR_FB_LABEL,or_fb_lbl.getText());
+
+	 boolean NOT_FB = true;
+	 WebElement continue_btn = null;
+	 
+	 if(NOT_FB){
+			// CONTINUE button
+		 continue_btn = driver.findElement(By.xpath("/html/body/main/div/div[1]/div[2]/div/form/a"));
+	 }else{
+			// FB button
+		 continue_btn = driver.findElement(By.xpath("/html/body/main/div/div[1]/div[2]/div/div[2]/div/a"));		
+	 }
+	 continue_btn.click();
+	 
+//	 PASSWORD
+	
+	 String FIRST_NAME = "qa";
+	 String PASSWORD = "tatcha123";
+	 
+	 String ENTER_PWD = "Welcome back, "+FIRST_NAME+". Please enter your password to continue.";
+	 String PASSWORD_LBL = "PASSWORD";
+	 String FORGOT_PASSWORD_LBL = "Forgot Your Password?";
+
+	 WebElement pwdEnter = driver.findElement(By.xpath("//*[@id='dwfrm_login']/div[2]/div[1]/div/h5"));
+	 assertEquals(ENTER_PWD,pwdEnter.getText());
+		 
+	 WebElement pwdTitle = driver.findElement(By.xpath("//*[@id='dwfrm_login']/div[2]/div[2]/div/div[1]/div/label/span"));
+	 assertEquals(PASSWORD_LBL,pwdTitle.getText());
+
+	 WebElement password = driver.findElement(By.xpath("//*[@id='dwfrm_login_password']"));
+	 assertEquals(PASSWORD,password.getText());
+	 
+//	 Forgot Your Password?
+	 WebElement forgotPwdEle = driver.findElement(By.xpath("//*[@id='dwfrm_login']/div[2]/div[2]/div/div[2]/a")); 
+	 assertEquals(FORGOT_PASSWORD_LBL,forgotPwdEle.getText());
+	 forgotPwdEle.click();
+	 
+	 if(NOT_FB){
+			// CONTINUE button
+		 continue_btn = driver.findElement(By.xpath("//*[@id='dwfrm_login']/div[2]/div[2]/div/button"));
+	 }else{
+			// FB button
+		 continue_btn = driver.findElement(By.xpath("//*[@id='login-fb-checkout']/div/div[2]/div[2]/div/div/div/a"));				
+	 }
+  }
+  
+  /** MOC 203 */
+  private void testRecommendedFor(WebDriver driver,Product product){
+	  
+//	  Benefits
+	  String BENEFITS="Benefits";
+	  String RECOMMENDED_FOR="Recommended For";
+	    WebElement benefitsTitle = driver.findElement(By.xpath("//*[@id='benefits']/h2"));
+	    assertEquals(BENEFITS, benefitsTitle.getText());
+	    
+//	Recommended For
+	    WebElement recommendedForTitle = driver.findElement(By.xpath("//*[@id='benefits']/div[1]/div/h2"));
+	    assertEquals(RECOMMENDED_FOR, recommendedForTitle.getText());
+	    
+	    String[] recommended = { "NORMAL","DRY","OILY","ACNE SCARS","BRIGHTENING","DARK SPOTS"};
+	    Set<String> recommendedValues = new HashSet<String>(Arrays.asList(recommended));
+	    
+	    for(int index=1;index<=6;index++){
+	    	try{
+		//	    images 
+				    WebElement img = driver.findElement(By.xpath("//*[@id='benefits']/div[1]/div/div/div/div["+index+"]/img"));
+		//		    64 x 64s
+				    assertEquals(64, img.getSize().getHeight());
+				    assertEquals(64, img.getSize().getWidth());
+		//		image titles
+				    WebElement imgTitle = driver.findElement(By.xpath("//*[@id='benefits']/div[1]/div/div/div/div["+index+"]/div")); 
+				    recommendedValues.contains(imgTitle.getText());
+				    recommendedValues.remove(imgTitle.getText());
+	    	}catch(NoSuchElementException ne){
+	    		System.err.println("No Element "+index+" in Recommended For "+ne.toString());
+	    	}
+	    }
+  }
+  
+  
+  /** MOC 204 
+ * @throws CharacterLengthExceededException */
+  private void testWhatItis(WebDriver driver,Product product) throws CharacterLengthExceededException{
+	  
+	  // whatsLabel
+	  // Pure and Finest product
+	  String WHATS_LABEL = "Pure and Finest product";
+	  WebElement whatsEle = driver.findElement(By.xpath("//*[@id='product-content']/div[4]/p"));
+	  assertEquals(WHATS_LABEL, whatsEle.getText());
+	  // char count 185 MAX
+		if(whatsEle.getText().length()>185){
+			throw new CharacterLengthExceededException("For What it is: length of characters is greater than specified limit (185)");
+		}
+  }
+  
+  /** MOC 205 
+ * @throws CharacterLengthExceededException */
+  private void testWhyItWorks(WebDriver driver,Product product) throws CharacterLengthExceededException{
+	
+	// Title
+	  WebElement testWiwTitle = driver.findElement(By.xpath("//*[@id='benefits']/div[2]/div/div/div/h2"));	
+
+	// points
+	  String WIW_POINT_NAME = "2 Types of Vitamin C";
+	  for(int index=1;index<=4;index++){
+		  try{
+		  WebElement testWiwPoint = driver.findElement(By.xpath("//*[@id='benefits']/div[2]/div/div/div/ul/li["+index+"]/strong"));
+		  WebElement testWiwPointdesc = driver.findElement(By.xpath("//*[@id='benefits']/div[2]/div/div/div/ul/li["+index+"]/span")); 
+		  	assertEquals(WIW_POINT_NAME, testWiwPoint.getText());
+		  	if(testWiwPointdesc.getText().length()>750){
+		  		throw new CharacterLengthExceededException("Length of Characters in greater than limit (750)");
+		  	}
+		  }catch(NoSuchElementException ne){
+			  System.err.println("Point "+index+" not found for Why It Works");
+		  }
+	  }
+  }
+  
+  /** MOC 206 */
+  private void testIngredient(WebDriver driver,Product product){
+	  try{
+	// 	  Title	  
+		  WebElement ingrTitleEle = driver.findElement(By.xpath("//*[@id='ingredients']/h2"));
+		  WebElement ingrDescEle = driver.findElement(By.xpath("//*[@id='ingredients']/div[1]/div/div/div[1]"));
+		  
+	//	  Formulated without:
+		  WebElement ingrFormHeadEle = driver.findElement(By.xpath("//*[@id='ingredients']/div[1]/div/div/div[2]/h5"));
+		  WebElement ingrFormDescEle = driver.findElement(By.xpath("//*[@id='ingredients']/div[1]/div/div/div[2]"));
+	
+	//	  Full Ingredient List	  
+		  WebElement fullIngrListEle = driver.findElement(By.xpath("//*[@id='ingredients']/div[1]/div/div/div[3]/a"));
+		  
+	  }catch(NoSuchElementException ne){
+		  System.err.println("Ingredient Not present "+ne.toString());
+	  }
+//    Spotlight Ingredients
+	  for(int index=2; index <=4; index++ ){
+		  try{
+			  WebElement spotImgEle = driver.findElement(By.xpath("//*[@id='ingredients']/div["+index+"]/div/div/div[1]/img"));
+			  System.out.println("Image Height: "+spotImgEle.getSize().getHeight());
+			  System.out.println("Image Width: "+spotImgEle.getSize().getWidth());
+			  	  
+			  WebElement spotTitleEle = driver.findElement(By.xpath("//*[@id='ingredients'/div["+index+"]/div/div/div[2]/h2"));
+			  System.out.println("Spotlight Title - "+spotTitleEle.getText());
+			  WebElement spotDescEle = driver.findElement(By.xpath("//*[@id='ingredients']/div["+index+"]/div/div/div[2]/p"));    
+			  System.out.println("Spotlight Desc - "+spotDescEle.getText());
+		  }catch(NoSuchElementException ne){
+			  System.err.println("Spotlight Ingredient Item "+(index-1)+" Not present "+ne.toString());
+		  }
+	  }
+  }
+  
+  /** MOC 207 */
+  private void testHadasei(WebDriver driver,Product product){
+	  System.out.println("------testHadasei-------");
+//	  Hadasei-3
+	  
+//	  driver.findElement(by);
+	  /** Checking Hadasei Title and Description */
+	  
+	  String HADASEI_TITLE = "Hadasei-3";
+	  String HADASEI_DESC = "​Tatcha’s trinity of anti-aging superfoods reveals soft, youthful skin.";
+	  
+	  WebElement hadaTitle = driver.findElement(By.xpath("//*[@id='ingredients']/div[5]/div/div/h2"));
+	  assertEquals(HADASEI_TITLE, hadaTitle.getText());
+	  WebElement hadaDesc = driver.findElement(By.xpath("//*[@id='ingredients']/div[5]/div/div/p"));
+	  assertEquals(HADASEI_DESC, hadaDesc.getText());
+	  
+//	  Uji Green Tea
+//	  Okinawa Mozuku Algae
+//	  Akita Rice
+//	  
+//	  Test ContentPrized throughout Japan as the purest, finest source of Green Tea, this powerful antioxidant-rich botanical from Kyoto is known to detoxify and prevent signs of premature aging.
+//	  This sea treasure from Japan’s tropical islands is rich inpolysaccharides, essential for skin water retention and renewal.
+//	  This rice is known as the finest rice in Japan for its superior taste and quality. Itis also a nourishing moisturizer, rich in essential proteins.
+	  
+	  
+	  for(int index = 1; index<=3; index++){
+		  try{
+			  WebElement itemImg = driver.findElement(By.xpath("//*[@id='ingredients']/div[5]/div/div/div/div["+index+"]/div/img"));
+			  System.out.println("HADA - "+itemImg.getTagName());
+			  WebElement itemName = driver.findElement(By.xpath("//*[@id='ingredients']/div[5]/div/div/div/div["+index+"]/div/h5"));
+			  System.out.println("HADA - "+itemName.getText());
+			  WebElement itemDesc = driver.findElement(By.xpath("//*[@id='ingredients']/div[5]/div/div/div/div["+index+"]/div/p"));
+			  System.out.println("HADA - "+itemDesc.getText());
+		  }catch(NoSuchElementException ne){
+			  System.err.println("HADASEI Item "+index+" Not present "+ne.toString());
+		  }
+	  }
+  }
+  
+ /** MOC 208 
+ * @throws CharacterLengthExceededException */ 
+ private void testHowToUse(WebDriver driver,Product product) throws CharacterLengthExceededException{
+	  String HOW_USE = "HOW TO USE";
+	  String HOW_USE_TITLE1="Suggested Usage";
+	  String HOW_USE_TITLE2="Dosage";
+	  String HOW_USE_TITLE3="Texture";
+	  WebElement howUseTitle = driver.findElement(By.xpath("//*[@id='howTo']/h2"));
+	  assertEquals(HOW_USE, howUseTitle.getText());
+	  
+	//*[@id='player_uid_596820346_1']
+	  WebElement howUsePlayer = driver.findElement(By.xpath("//div[contains(@id,'player_uid')]"));
+	  howUsePlayer.click();
+
+//	  Suggested Usage
+	  WebElement howUseTitle1 = driver.findElement(By.xpath("//*[@id='howTo']/div/div/div/div[2]/h2[1]"));
+	  WebElement howUseTitle1desc = driver.findElement(By.xpath("//*[@id='howTo']/div/div/div/div[2]/p[1]"));
+	  assertEquals(HOW_USE_TITLE1,howUseTitle1.getText());
+  		if(howUseTitle1desc.getText().length()>200){
+  			throw new CharacterLengthExceededException("For Suggested Usage: length of characters is greater than specified limit (200)");
+  		}
+
+//	  Dosage
+  	  WebElement howUseTitle2 = driver.findElement(By.xpath("//*[@id='howTo']/div/div/div/div[2]/h2[2]"));
+  	  WebElement howUseTitle2desc = driver.findElement(By.xpath("//*[@id='howTo']/div/div/div/div[2]/p[2]"));
+  	  assertEquals(HOW_USE_TITLE2,howUseTitle2.getText());
+    		if(howUseTitle2desc.getText().length()>100){
+    			throw new CharacterLengthExceededException("For Dosage: length of characters is greater than specified limit (100)");
+    		}
+//	  Texture
+  	  WebElement howUseTitle3 = driver.findElement(By.xpath("//*[@id='howTo']/div/div/div/div[2]/h2[3]"));
+  	  WebElement howUseTitle3desc = driver.findElement(By.xpath("//*[@id='howTo']/div/div/div/div[2]/p[3]"));
+  	  assertEquals(HOW_USE_TITLE3,howUseTitle3.getText());
+    		if(howUseTitle3desc.getText().length()>50){
+    			throw new CharacterLengthExceededException("For Texture: length of characters is greater than specified limit (50)");
+    		}		
+ 
+ }
+ 
+ /** MOC 211 
+ * @throws CharacterLengthExceededException */
+ private void testPurityPromise(WebDriver driver,Product product) throws CharacterLengthExceededException{
+	 String PP_TITLE = "Purity Promise";
+	 // Image
+ 	  WebElement ppImage = driver.findElement(By.xpath("//*[@id='main']/div[4]/div/div/div/p[1]/img"));	 
+ 	 ppImage.getSize().getHeight();
+ 	ppImage.getSize().getWidth();
+	 
+ 	  // Title
+ 	  WebElement ppTitle = driver.findElement(By.xpath("//*[@id='main']/div[4]/div/div/div/h2"));
+ 	  assertEquals(PP_TITLE,ppTitle.getText());
+ 	  
+ 	  // Description
+ 	  WebElement ppDesc = driver.findElement(By.xpath("//*[@id='main']/div[4]/div/div/div/p[2]"));
+		if(ppDesc.getText().length()>200){
+			throw new CharacterLengthExceededException("For Purity Promise: length of characters is greater than specified limit (200)");
+		}
+ }
   
   private void testBAGforGuest(WebDriver driver, List<Product> productList) throws Exception {
 	  /** Click on Bag Cart button */
@@ -714,6 +1004,7 @@ public class AddToCartGuest {
 	    }
 
 	  }
+  
   private boolean elementPresent(String[] elementArray, String element){
 	  boolean status = false;
 	  for(String ele : elementArray){

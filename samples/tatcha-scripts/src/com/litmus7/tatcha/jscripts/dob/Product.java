@@ -5,10 +5,12 @@ public class Product {
 	private String pid;
 	private String name;
 	private String price;
+	private String highPrice;
+	private String lowPrice;
 	private String subtitle;
 	private String variant1;
 	private String variant2;
-	
+
 	public String getPid() {
 		return pid;
 	}
@@ -20,6 +22,18 @@ public class Product {
 	}
 	public void setName(String name) {
 		this.name = name;
+	}
+	public String getHighPrice() {
+		return highPrice;
+	}
+	public void setHighPrice(String highPrice) {
+		this.highPrice = highPrice;
+	}
+	public String getLowPrice() {
+		return lowPrice;
+	}
+	public void setLowPrice(String lowPrice) {
+		this.lowPrice = lowPrice;
 	}
 	public String getPrice() {
 		return price;
