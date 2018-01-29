@@ -13,6 +13,13 @@
     </properties>
     
 	<build>
+
+	    <resources>
+	        <resource>
+	            <directory>src/com/litmus7/tatcha/data</directory>
+	        </resource>
+	    </resources>
+ 
 	    <!-- <sourceDirectory>src</sourceDirectory> -->
 	    <testSourceDirectory>src</testSourceDirectory>
 	    <plugins>
@@ -31,7 +38,23 @@
 	               <version>2.20</version>
 	               <configuration>
 	                   <includes>	
- 						    <include>com/litmus7/tatcha/jscripts/selenium/TsignUp*.java</include> 					    
+	
+ 				<!-- Sprint 3
+ 						    	<include>com/litmus7/tatcha/jscripts/selenium/myaccount/MyAccount_MOC_16.java</include> 
+ 						    	<include>com/litmus7/tatcha/jscripts/selenium/myaccount/AddressBook.java</include> 	
+ 						    	<include>com/litmus7/tatcha/jscripts/selenium/myaccount/PaymentOptions.java</include>  					    	
+ 						  		    	
+ 						    	<include>com/litmus7/tatcha/jscripts/selenium/login/MyLogin.java</include> 
+ 						    	<include>com/litmus7/tatcha/jscripts/selenium/login/MyLoginWithFB.java</include> 	
+ 						    	<include>com/litmus7/tatcha/jscripts/selenium/login/Register.java</include> 	
+ 						   		<include>com/litmus7/tatcha/jscripts/selenium/login/RegisterWithFB.java</include>  
+ 						   		<include>com/litmus7/tatcha/jscripts/selenium/navigation/GlobalNavigation_HeaderLinks_MOC_33.java</include>	
+ 						        <include>com/litmus7/tatcha/jscripts/selenium/navigation/GlobalNavigation_FooterLinks_MOC_39.java</include>		 		   		
+ 				-->	 
+ 				
+ 				<!-- Sprint 4 -->						    
+				   	  			<include>com/litmus7/tatcha/jscripts/selenium/bags/AddToCartGuest.java</include>	
+		      
 	                   </includes>
 	                   <systemPropertyVariables>
 	                       <!-- Relocate the XLT results directory under target. -->
