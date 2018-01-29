@@ -49,7 +49,6 @@ public class BrowserDriver extends AbstractScriptTestCase {
 
 	public static WebDriver getChromeWebDriver(){
         capabilities = DesiredCapabilities.chrome();
-        
 //      capabilities.setCapability("webdriver.chrome.bin", path);
 //	   	 pathToBrowser = getProperty("xlt.webDriver.chrome.pathToBrowser");
 //	     pathToDriverServer = getProperty("xlt.webDriver.chrome.pathToDriverServer");  

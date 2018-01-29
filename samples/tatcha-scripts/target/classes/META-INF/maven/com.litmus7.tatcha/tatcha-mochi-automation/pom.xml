@@ -1,74 +1,144 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	 
+	
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.litmus7.tatcha</groupId>
 	<artifactId>tatcha-mochi-automation</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>tatcha-mochi-automation</name>
 	<description>Tatcha Mochi Automation Scripts</description>
-	  
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-    
+	
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
 	<build>
-	    <!-- <sourceDirectory>src</sourceDirectory> -->
-	    <testSourceDirectory>src</testSourceDirectory>
-	    <plugins>
-		      <plugin>
-		        <artifactId>maven-compiler-plugin</artifactId>
-		        <version>3.3</version>
-		        <configuration>
-		          <source>1.8</source>
-		          <target>1.8</target>
-		        </configuration>
-		      </plugin>
-	      
-	       	  <plugin>
-	               <groupId>org.apache.maven.plugins</groupId>
-	               <artifactId>maven-surefire-plugin</artifactId>
-	               <version>2.20</version>
-	               <configuration>
-	                   <includes>	
- 						    <include>com/litmus7/tatcha/jscripts/selenium/TsignUp*.java</include> 					    
-	                   </includes>
-	                   <systemPropertyVariables>
-	                       <!-- Relocate the XLT results directory under target. -->
-	                       <com.xceptance.xlt.result-dir>${project.build.directory}/xlt-results</com.xceptance.xlt.result-dir>
-	                   </systemPropertyVariables>
-	               </configuration>
-	          </plugin>    
-	    </plugins>
+
+		<resources>
+			<resource>
+				<directory>src/com/litmus7/tatcha/data</directory>
+			</resource>
+		</resources>
+
+		<!-- <sourceDirectory>src</sourceDirectory> -->
+		<testSourceDirectory>src</testSourceDirectory>
+		<plugins>	
+		
+
+		 <!-- 
+	      <plugin>
+	        <groupId>org.codehaus.mojo</groupId>
+	        <artifactId>properties-maven-plugin</artifactId>
+	        <version>1.0-alpha-2</version>
+	        <executions>
+	          <execution>
+	            <phase>initialize</phase>
+	            <goals>
+	              <goal>read-project-properties</goal>
+	            </goals>
+	            <configuration>
+	              <files>
+	                 <file>${project.build.resources[0].directory}/${myenv}.properties</file>       
+	              </files>
+	            </configuration>
+	          </execution>
+	        </executions>
+	      </plugin>
+		 -->
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.3</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.20</version>
+				<configuration>
+					<includes>
+
+						<!-- Sprint 3 <include>com/litmus7/tatcha/jscripts/selenium/myaccount/MyAccount_MOC_16.java</include> 
+							<include>com/litmus7/tatcha/jscripts/selenium/myaccount/AddressBook.java</include> 
+							<include>com/litmus7/tatcha/jscripts/selenium/myaccount/PaymentOptions.java</include> 
+							<include>com/litmus7/tatcha/jscripts/selenium/login/MyLogin.java</include> 
+							<include>com/litmus7/tatcha/jscripts/selenium/login/MyLoginWithFB.java</include> 
+							<include>com/litmus7/tatcha/jscripts/selenium/login/Register.java</include> 
+							<include>com/litmus7/tatcha/jscripts/selenium/login/RegisterWithFB.java</include> 
+							<include>com/litmus7/tatcha/jscripts/selenium/navigation/GlobalNavigation_HeaderLinks_MOC_33.java</include> 
+							<include>com/litmus7/tatcha/jscripts/selenium/navigation/GlobalNavigation_FooterLinks_MOC_39.java</include> -->
+
+						<!-- Sprint 3 -->
+							<!-- 
+						<include>com/litmus7/tatcha/jscripts/selenium/sprint3/Login.java</include>							
+						<include>com/litmus7/tatcha/jscripts/selenium/navigation/GlobalNavigation_HeaderLinks_MOC_33.java</include> 
+						<include>com/litmus7/tatcha/jscripts/selenium/navigation/GlobalNavigation_FooterLinks_MOC_39.java</include> 
+							-->
+						<!-- Sprint 4 -->	
+						<!-- 
+						<include>com/litmus7/tatcha/jscripts/selenium/sprint4/AddToCartGuestUser.java</include>
+							-->
+						<!-- Sprint 5 -->
+						<include>com/litmus7/tatcha/jscripts/selenium/sprint5/AddToCartGuest.java</include>
+						
+					</includes>
+					<systemPropertyVariables>
+						<!-- Relocate the XLT results directory under target. -->
+						<com.xceptance.xlt.result-dir>${project.build.directory}/xlt-results</com.xceptance.xlt.result-dir>
+					</systemPropertyVariables>
+				</configuration>
+			</plugin>
+		</plugins>
 	</build>
   
-    <repositories>
-        <!-- Declare Xceptance repository that hosts the XLT artifacts -->
-        <repository>
-            <id>xceptance-releases</id>
-            <url>https://lab.xceptance.de/nexus/content/repositories/releases/</url>
-        </repository>
-    </repositories>
+	<repositories>
+		<!-- Declare Xceptance repository that hosts the XLT artifacts -->
+		<repository>
+			<id>xceptance-releases</id>
+			<url>https://lab.xceptance.de/nexus/content/repositories/releases/</url>
+		</repository>
+	</repositories>
 
-    <dependencies>
-        <!-- Declare XLT dependency -->
-        <dependency>
-            <groupId>com.xceptance</groupId>
-            <artifactId>xlt</artifactId>
-            <version>4.9.4</version>
-        </dependency>
-           <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>2.6</version>
-        </dependency>
-        <!-- Declare Saucelabs dependency -->
-            <dependency>
-            <groupId>com.saucelabs</groupId>
-            <artifactId>sauce_junit</artifactId>
-            <version>2.1.20</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-    
+	<dependencies>
+		<!-- Declare XLT dependency -->
+		<dependency>
+			<groupId>com.xceptance</groupId>
+			<artifactId>xlt</artifactId>
+			<version>4.9.4</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.6</version>
+		</dependency>
+		
+		<!-- Declare Saucelabs dependency -->
+		<dependency>
+			<groupId>com.saucelabs</groupId>
+			<artifactId>sauce_junit</artifactId>
+			<version>2.1.20</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- Log 4j -->
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.17</version>
+		</dependency>
+	</dependencies>
+	
+		<!-- For generating Test Report -->
+	<reporting>
+	    <plugins>
+	      <plugin>
+	        <groupId>org.apache.maven.plugins</groupId>
+	        <artifactId>maven-surefire-report-plugin</artifactId>
+	        <version>2.20.1</version>
+	      </plugin>
+	    </plugins>
+  	</reporting>
+
 </project>

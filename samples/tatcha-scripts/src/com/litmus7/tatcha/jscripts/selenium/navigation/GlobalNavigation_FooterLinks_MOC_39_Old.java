@@ -1,4 +1,4 @@
-package com.litmus7.tatcha.jscripts.selenium.gfooter;
+package com.litmus7.tatcha.jscripts.selenium.navigation;
 
 import java.util.regex.Pattern;
 import java.io.FileInputStream;
@@ -16,7 +16,7 @@ import org.openqa.selenium.support.ui.Select;
 import com.litmus7.tatcha.jscripts.selenium.Tcheck_Login;
 import com.litmus7.tatcha.utils.BrowserDriver;
 
-public class MOC_39_TC_ALL {
+public class GlobalNavigation_FooterLinks_MOC_39_Old {
   private WebDriver driver;
   private String baseUrl;
   private boolean acceptNextAlert = true;
@@ -37,44 +37,15 @@ public class MOC_39_TC_ALL {
     driver.get(BrowserDriver.BASE_URL);
    
     Properties prop = new Properties();
-
-//	prop.load(new FileInputStream("/src/com/litmus7/tatcha/data/footer.properties"));
-	
-//	prop.load(getClass().getResourceAsStream("src/com/litmus7/tatcha/data/footer.properties"));
-//	prop.load(new FileInputStream(getClass().getResource("classpath:src/com/litmus7/tatcha/data/footer.properties").getFile()));
-    System.out.println("footer path "+getClass().getResource("/tatcha.properties"));
 	prop.load(new FileInputStream(getClass().getResource("/tatcha.properties").getFile()));
-//	prop.load(new FileInputStream("footer.properties"));
     
-//    InputStream inputStream = MOC_39_TC_ALL.class.getResourceAsStream("footer.properties");
-//    prop.load(inputStream);
-//    inputStream.close();
-    
-    BrowserDriver browserDriver = new BrowserDriver();
-    
-    /** Checking Footer Links */
-//    for(int i=1;i<5;i++){
-//    	String[] footerLinks = prop.get("footer.links."+i).toString().split("#");
-//    	browserDriver.assertWhetherLinksPresent(driver, footerLinks);
-//    }
-//    
-
     /** Checking 5 Header Links */
     driver.get(BrowserDriver.BASE_URL);
-    for(int i=1;i<=5;i++){
-    	String[] headerLinks = prop.get("header.links."+i).toString().split("#");
-    	
-	    WebElement we = driver.findElement(By.linkText(headerLinks[0]));
-	    Actions action = new Actions(driver);
-	    action.moveToElement(we).build().perform();
-	    
-    	browserDriver.assertWhetherLinksPresent(driver, headerLinks);
-    }
     
     /** Checking 5 Footer Links */
 	    for(int i=1;i<=5;i++){
 	    	String[] footerLinks = prop.get("footer.links."+i).toString().split("#");
-	    	browserDriver.assertWhetherLinksPresent(driver, footerLinks);
+	    	assertWhetherFooterLinksPresent(driver, footerLinks);
 	    }
     
 /*    String footerH1 = 
@@ -134,6 +105,90 @@ public class MOC_39_TC_ALL {
 //  action.moveToElement(we).moveToElement(webdriver.findElement(By.xpath("/expression-here"))).click().build().perform();
 //  action.moveToElement(we).build().perform();
 
+  /**
+	  * This method only works with Anchor tag elements 
+	  * read from footer.properties file
+	  * 
+	  * @param driver1
+	  * @param arrayLinks
+	  */
+	public void assertWhetherFooterLinksPresent(WebDriver driver1 , String[] arrayLinks){
+		    
+			  try{
+				    int totalLinks = arrayLinks.length;
+				    System.out.println("totalLinks "+totalLinks);
+				    for(int i=0;i<totalLinks;i++){
+					    if(!arrayLinks[i].trim().isEmpty()){
+					    	String ELEMENT_NAME = null;
+					    	if(!arrayLinks[i].contains("@")){	
+					    		ELEMENT_NAME = arrayLinks[i];
+					    		System.out.println("ELEMENT_NAME "+ELEMENT_NAME);	
+//					    		WebElement webElement = driver1.findElement(By.linkText(ELEMENT_NAME));
+//					    		WebElement webElement = driver1.findElement(By.xpath("//*a[contains(text(),'"+ELEMENT_NAME+"')]"));
+//					    		webElement.click();
+//					    		driver.navigate().back();
+					    		
+//					    		if(ELEMENT_NAME.equalsIgnoreCase("heading")){
+//									  
+//					    		}
+					    	}else{
+					    		String[] eleHrefTitle = arrayLinks[i].toString().split("@");
+						    	ELEMENT_NAME = (null != eleHrefTitle[0])?eleHrefTitle[0].trim():"";
+						    	System.out.println("ELEMENT_NAME "+ELEMENT_NAME);	
+					    	
+						    	if(!ELEMENT_NAME.isEmpty()){
+						    		if(ELEMENT_NAME.equalsIgnoreCase("heading")){
+					    				
+						    		}else{		    		
+								    	String HREF_URL = (null != eleHrefTitle[1])?eleHrefTitle[1].trim():"";
+								    	String NEXT_PAGE_TITLE = null;
+								    	if(eleHrefTitle.length>2){
+								    		NEXT_PAGE_TITLE = (null != eleHrefTitle[2])?eleHrefTitle[2].trim():"";
+								    	}
+								    	 
+								    	try{
+								    	
+								    		WebElement webElement = driver1.findElement(By.linkText(ELEMENT_NAME));
+								        	assertEquals(ELEMENT_NAME, webElement.getText());
+								        	System.out.println(webElement.getText());
+								        	
+								        	if(null!= HREF_URL && !HREF_URL.isEmpty() && !HREF_URL.equalsIgnoreCase("NO_LINK")){
+	//							        		String parentHandle = driver.getWindowHandle(); 
+	//								    	    System.out.println(parentHandle);             
+									    	    String anchorURL = webElement.getAttribute("href"); 
+									    	    assertEquals(HREF_URL, anchorURL);
+									    	    webElement.click();  
+									    	    
+		//							    	    for (String winHandle : driver.getWindowHandles()) { 
+		//							    	        System.out.println(winHandle);
+		//							    	        driver.switchTo().window(winHandle);                 
+		//							    	    }
+									    	    
+									    	    if(null!= NEXT_PAGE_TITLE && !NEXT_PAGE_TITLE.isEmpty() && !NEXT_PAGE_TITLE.equalsIgnoreCase("NO_TITLE")){
+										    	    assertEquals(NEXT_PAGE_TITLE, driver.getTitle());
+									    	    }
+									    	    
+									    	    driver.navigate().back();
+									    	    
+		//							    	    driver.close();                                
+		//							    	    driver.switchTo().window(parentHandle);   
+								        	}
+								    	}catch(NoSuchElementException ne){
+								    		System.err.println(ELEMENT_NAME+" HREF NOT FOUND "+ne.toString());
+								    	}catch (ElementNotVisibleException nv) {
+								    		System.err.println(ELEMENT_NAME+" NOT VISIBLE "+nv.toString());
+										}
+						    		}
+						    	}
+					    	}
+				    	}
+				        	
+				    }
+			  }catch(Exception e){
+			  		e.printStackTrace();
+			  	
+			  }
+	}
 
   @After
   public void tearDown() throws Exception {

@@ -10,6 +10,7 @@ public class Product {
 	private String subtitle;
 	private String variant1;
 	private String variant2;
+	private String wasPrice;
 
 	public String getPid() {
 		return pid;
@@ -59,4 +60,11 @@ public class Product {
 	public void setVariant2(String variant2) {
 		this.variant2 = variant2;
 	}
+	 public String getWasPrice() {
+	     return wasPrice;
+	 }
+	 public void setWasPrice(String wasPrice) {
+	     this.wasPrice = wasPrice;
+	 }
+     
 }
