@@ -2,6 +2,7 @@ package com.litmus7.tatcha.jscripts.selenium.sprint5;
 
 import javax.activity.InvalidActivityException;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,6 +40,8 @@ public class AddToCartGuest {
 	private int productId = 10001;
 
 	private final static Logger logger = Logger.getLogger(AddToCartGuest.class);
+	private Properties locator = new Properties();
+	private Properties prop = new Properties();
 
 	@Before
 	public void setUp() throws Exception {
@@ -49,43 +52,45 @@ public class AddToCartGuest {
 		driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 	}
 
-	/** For testing POM Dynamic attributes 
-	 * @throws IOException */
-	private void testMavenDynamicProperties() throws IOException{
+	/**
+	 * For testing POM Dynamic attributes
+	 * 
+	 * @throws IOException
+	 */
+	private void testMavenDynamicProperties() throws IOException {
 		logger.info("inside testMavenDynamicProperties");
 		java.io.InputStream is = this.getClass().getResourceAsStream("QA.properties");
 		java.util.Properties p = new Properties();
 		p.load(is);
 		String username = p.getProperty("login.username");
 		String password = p.getProperty("login.password");
-		logger.info("username:"+username);
-		logger.info("password:"+password);
+		logger.info("username:" + username);
+		logger.info("password:" + password);
 	}
-	
+
 	@Test
 	public void testAddToCartGuest() throws Exception {
 		// driver.get(baseUrl +
 		// "/on/demandware.store/Sites-tatcha-Site/default/Login-Show?original=%2fs%2ftatcha%2faccount%3flang%3ddefault");
 		driver.get(baseUrl);
-		
-//		testMavenDynamicProperties();
-		
+
+		// testMavenDynamicProperties();
+
+		locator.load(new FileInputStream(getClass().getResource("/elementLocator.properties").getFile()));
+		prop.load(new FileInputStream(getClass().getResource("/tatcha.properties").getFile()));
+
 		Product product = new Product();
 
 		/** ------------ Adding Products to Mini Cart ------------ */
 		Actions action = new Actions(driver);
-		int prodCount = 3;
+//		int prodCount = 3;
 
-		ArrayList<String> productNames = new ArrayList<String>();
-//		 productNames.add("CAMELLIA BEAUTY OIL TRAVEL SIZE");
-		// productNames.add("Yume Kimono Cuff - Gold");
-		// productNames.add("The Brightening Set");
-		productNames.add("Once Step Camellia Cleansing Oil");
-		 
-//		 productNames.add("ONE STEP CAMELLIA CLEANSING OIL");
+		String[] products = prop.getProperty("product.names").toString().split("\\|");
+
+		// productNames.add("ONE STEP CAMELLIA CLEANSING OIL");
 
 		WebDriverWait wait = (WebDriverWait) new WebDriverWait(driver, 3);
-		for (String productName : productNames) {
+		for (String productName : products) {
 
 			/** Find product by hovering shop all - works only for Page one */
 
@@ -110,13 +115,14 @@ public class AddToCartGuest {
 			// going to PDP
 			product.setPid("P" + (productId++));
 			product.setName(productName);
-			testPDPforGuest(driver, product);
-//			testBAGforGuest(driver, prodList);
+			testPDPforGuest(driver, product, locator);
+			// testBAGforGuest(driver, prodList);
 		}
 
 		// Mini Cart item count
 		String itemCount = driver.findElement(By.cssSelector("div.badge.bag-count")).getText();
-		assertEquals(prodCount, itemCount + "");
+		logger.info("Item Count" + itemCount);
+		// assertEquals(prodCount, itemCount + "");
 
 		// Going to Bag Page
 		driver.findElement(By.linkText("1")).click();
@@ -201,7 +207,7 @@ public class AddToCartGuest {
 	 * @throws InvalidElementException
 	 * @throws CharacterLengthExceededException
 	 */
-	private void testPDPforGuest(WebDriver driver, Product product)
+	private void testPDPforGuest(WebDriver driver, Product product, Properties locator)
 			throws InvalidElementException, CharacterLengthExceededException {
 
 		// Marketing Flags
@@ -213,7 +219,8 @@ public class AddToCartGuest {
 			String marketFlag1 = flag1Ele1.getText().trim();
 			// *[@id="pdpMain"]/div[1]/div[1]/div/span[1]
 			// *[@id="pdpMain"]/div[1]/div[1]/div/span[3]
-			WebElement flag1Ele2 = driver.findElement(By.xpath("//div[@id='product-content']/div[2]/div/span[3]"));
+			
+			WebElement flag1Ele2 = driver.findElement(By.xpath(locator.getProperty("marketingFlag.two").toString()));
 			String marketFlag2 = flag1Ele2.getText().trim();
 
 			// assertEquals("New", marketFlag1);
@@ -263,6 +270,7 @@ public class AddToCartGuest {
 			logger.error(" No Marketing Banner !!! ");
 		}
 
+		
 		// Product Title
 		try {
 			WebElement prodTitleEle = driver
@@ -270,7 +278,7 @@ public class AddToCartGuest {
 			String prodTitle = prodTitleEle.getText().toLowerCase();
 			assert (prodTitle.contains(product.getName().toLowerCase()));
 		} catch (NoSuchElementException ne) {
-			logger.error(" No Title !!! ");
+			logger.error(" No Title !!! "+ne.toString());
 		}
 		// Subtitle
 		try {
@@ -278,7 +286,7 @@ public class AddToCartGuest {
 					By.cssSelector("div.product-summary-desktop > h1.product-name > span.product-subtitle"));
 			product.setSubtitle(prodsubtitleEle.getText());
 		} catch (NoSuchElementException ne) {
-			logger.error(" No Subtitle !!! ");
+			logger.error(" No Subtitle !!! "+ne.toString());
 		}
 		// assertEquals(product.getSubtitle().toLowerCase(),
 		// prodsubtitleEle.getText().toLowerCase());
@@ -286,9 +294,10 @@ public class AddToCartGuest {
 		// driver.findElement(By.cssSelector("div.product-summary-desktop >
 		// h1.product-name > span.product-subtitle")).getText());
 
+				
 		// Product Price
 		String SPLITTER = "-";
-		String productPrice = driver.findElement(By.xpath("//*[@id='product-content']/div[3]/div/div[1]/div"))
+		String productPrice = driver.findElement(By.xpath(locator.getProperty("product.price").toString()))
 				.getText();
 		if (productPrice.contains(SPLITTER)) { // $15.00 - $45.00
 			String[] lowhighPrices = productPrice.split(SPLITTER);
@@ -310,8 +319,11 @@ public class AddToCartGuest {
 
 		boolean skinValidity = false;
 		try {
+			
+
+					
 			String[] skinVariants = { "Normal", "Combination", "Dry", "Sensitive", "Oily" };
-			WebElement skinTitle = driver.findElement(By.xpath("//*[@id='product-content']/div[4]/div[2]/div[1]"));
+			WebElement skinTitle = driver.findElement(By.xpath(locator.getProperty("product.skinVariant").toString()));
 
 			if (null != skinTitle.getText() && "size".equalsIgnoreCase(skinTitle.getText())) {
 
@@ -330,6 +342,7 @@ public class AddToCartGuest {
 		} catch (NoSuchElementException ne) {
 			/** Skin Variants not present */
 			skinValidity = true;
+			logger.error(" No Skin Variant !!! "+ne.toString());
 		}
 
 		// Size
@@ -338,8 +351,9 @@ public class AddToCartGuest {
 
 		boolean sizeValidity = false;
 		try {
+					
 			String[] sizeVariants = { "60g / 2.1 oz.", "10g / .35 oz." };
-			WebElement sizeTitle = driver.findElement(By.xpath("//*[@id='product-content']/div[3]/div[2]/div[1]"));
+			WebElement sizeTitle = driver.findElement(By.xpath(locator.getProperty("product.sizeVariant").toString()));
 			if (null != sizeTitle.getText() && "size".equalsIgnoreCase(sizeTitle.getText())) {
 
 				for (int i = 1; i < 3; i++) {
@@ -357,6 +371,7 @@ public class AddToCartGuest {
 		} catch (NoSuchElementException ne) {
 			/** Size Variants not present */
 			sizeValidity = true;
+			logger.error(" No Size Varient !!! "+ne.toString());
 		}
 
 		/** Raising Invalid Skin & Size Variants as Exceptions */
@@ -384,6 +399,7 @@ public class AddToCartGuest {
 
 		} catch (NoSuchElementException ne) {
 			notifyQty = true;
+			logger.error(" No Notify Message !!! "+ne.toString());
 		}
 
 		// Throw exception if quantity notify msg is invalid
@@ -399,7 +415,8 @@ public class AddToCartGuest {
 			// assertEquals("1 2 3 4 5",
 			// driver.findElement(By.id("Quantity")).getText());
 		} catch (NoSuchElementException ne) {
-			logger.error("Quantity DDL not Present: " + ne.toString());
+			logger.error("No Quantity DDL : " + ne.toString());
+			
 		}
 
 		// Limit Quantity Message
@@ -455,7 +472,8 @@ public class AddToCartGuest {
 		try {
 			// WebElement reviewEle =
 			// driver.findElement(By.xpath("//*[@id='product-content']/div[2]/div[2]/div[2]/a"));
-			WebElement reviewEle = driver.findElement(By.xpath("//*[@id='product-content']/div[3]/div/div[2]/div/a"));
+			WebElement reviewEle = driver.findElement(By.xpath(locator.getProperty("product.reviews").toString()));
+			
 			String reviews = reviewEle.getText();
 			assertEquals("9,999 Reviews", reviews);
 
@@ -465,10 +483,11 @@ public class AddToCartGuest {
 			// throw ne;
 		}
 
+		
 		// Main Image & Thumbnails
 		// boolean imgValidity = false;
 		try {
-			WebElement imgMainEle = driver.findElement(By.xpath("//*[@id='image-container']/img"));
+			WebElement imgMainEle = driver.findElement(By.xpath(locator.getProperty("product.mainImage").toString()));
 			// imgValidity = true;
 			// imgMainEle.click();
 		} catch (NoSuchElementException ne) {
@@ -489,14 +508,14 @@ public class AddToCartGuest {
 		// driver.findElement(By.cssSelector("img.productthumbnail")).click();
 
 		/** Testing Sprint 5 stories - MOC 203,204,205,206,207,208,211 */
-		testRecommendedFor(driver, product);
-		testWhatItis(driver, product);
-		testWhyItWorks(driver, product);
-		testIngredient(driver, product);
-		testHadasei(driver, product);
-		testHowToUse(driver, product);
+		testRecommendedFor(driver, product, locator);
+		testWhatItis(driver, product, locator);
+		testWhyItWorks(driver, product, locator);
+		testIngredient(driver, product, locator);
+		testHadasei(driver, product, locator);
+		testHowToUse(driver, product, locator);
 		// Reviews & QA is missing - need to add
-		testPurityPromise(driver, product);
+		testPurityPromise(driver, product, locator);
 	}
 
 	/** MOC 190 */
@@ -510,22 +529,23 @@ public class AddToCartGuest {
 		String OR_FB_LABEL = "Or login/register with Facebook.";
 
 		driver.findElement(By.linkText("Checkout")).click();
-
-		WebElement chkLoginTitle = driver.findElement(By.xpath("/html/body/main/div/h1"));
+		
+		WebElement chkLoginTitle = driver.findElement(By.xpath(locator.getProperty("checkoutLogin.title").toString()));
 		assertEquals(CL_TITLE, chkLoginTitle.getText());
-		WebElement chkLoginDesc = driver.findElement(By.xpath("/html/body/main/div/div[1]/div[1]/div/p"));
+		WebElement chkLoginDesc = driver.findElement(By.xpath(locator.getProperty("checkoutLogin.desc").toString()));
 		assertEquals(CL_TITLE, chkLoginDesc.getText());
-		WebElement email_label = driver.findElement(By.xpath("/html/body/main/div/div[1]/div[2]/div/form/div/label"));
+		WebElement email_label = driver.findElement(By.xpath(locator.getProperty("checkoutLogin.email.label").toString()));
 		assertEquals(EMAIL_LABEL, email_label.getText());
-		WebElement email = driver.findElement(By.xpath("//*[@id='email']"));
+		WebElement email = driver.findElement(By.xpath(locator.getProperty("checkoutLogin.emailid").toString()));
 		assertEquals(EMAIL, email.getText());
 
 		WebElement email_placeholder = driver
-				.findElement(By.xpath("//input[contains(@id,'email') && ('placeholder','beautiful@tatcha.com')]"));
+				.findElement(By.xpath(locator.getProperty("checkoutLogin.email.placeholder").toString()));
 		// <input id="email" placeholder="beautiful@tatcha.com">
 
 		// Or
-		WebElement or_fb_lbl = driver.findElement(By.xpath("/html/body/main/div/div[1]/div[2]/div/div[2]/p"));
+		
+		WebElement or_fb_lbl = driver.findElement(By.xpath(locator.getProperty("checkoutLogin.fb.label").toString()));
 		assertEquals(OR_FB_LABEL, or_fb_lbl.getText());
 
 		boolean NOT_FB = true;
@@ -533,10 +553,10 @@ public class AddToCartGuest {
 
 		if (NOT_FB) {
 			// CONTINUE button
-			continue_btn = driver.findElement(By.xpath("/html/body/main/div/div[1]/div[2]/div/form/a"));
+			continue_btn = driver.findElement(By.xpath(locator.getProperty("checkoutLogin.continue").toString()));
 		} else {
 			// FB button
-			continue_btn = driver.findElement(By.xpath("/html/body/main/div/div[1]/div[2]/div/div[2]/div/a"));
+			continue_btn = driver.findElement(By.xpath(locator.getProperty("checkoutLogin.fb.continue").toString()));
 		}
 		continue_btn.click();
 
@@ -548,43 +568,46 @@ public class AddToCartGuest {
 		String ENTER_PWD = "Welcome back, " + FIRST_NAME + ". Please enter your password to continue.";
 		String PASSWORD_LBL = "PASSWORD";
 		String FORGOT_PASSWORD_LBL = "Forgot Your Password?";
-
-		WebElement pwdEnter = driver.findElement(By.xpath("//*[@id='dwfrm_login']/div[2]/div[1]/div/h5"));
+		
+		WebElement pwdEnter = driver.findElement(By.xpath(locator.getProperty("checkoutLogin.password.enter").toString()));
 		assertEquals(ENTER_PWD, pwdEnter.getText());
 
 		WebElement pwdTitle = driver
-				.findElement(By.xpath("//*[@id='dwfrm_login']/div[2]/div[2]/div/div[1]/div/label/span"));
+				.findElement(By.xpath(locator.getProperty("checkoutLogin.password.title").toString()));
 		assertEquals(PASSWORD_LBL, pwdTitle.getText());
 
-		WebElement password = driver.findElement(By.xpath("//*[@id='dwfrm_login_password']"));
+		WebElement password = driver.findElement(By.xpath(locator.getProperty("checkoutLogin.password.text").toString()));
 		assertEquals(PASSWORD, password.getText());
 
 		// Forgot Your Password?
-		WebElement forgotPwdEle = driver.findElement(By.xpath("//*[@id='dwfrm_login']/div[2]/div[2]/div/div[2]/a"));
+		WebElement forgotPwdEle = driver.findElement(By.xpath(locator.getProperty("checkoutLogin.password.forgot").toString()));
 		assertEquals(FORGOT_PASSWORD_LBL, forgotPwdEle.getText());
 		forgotPwdEle.click();
 
 		if (NOT_FB) {
 			// CONTINUE button
-			continue_btn = driver.findElement(By.xpath("//*[@id='dwfrm_login']/div[2]/div[2]/div/button"));
+			continue_btn = driver.findElement(By.xpath(locator.getProperty("checkoutLogin.continue").toString()));
 		} else {
 			// FB button
-			continue_btn = driver.findElement(By.xpath("//*[@id='login-fb-checkout']/div/div[2]/div[2]/div/div/div/a"));
+			continue_btn = driver.findElement(By.xpath(locator.getProperty("checkoutLogin.fb.continue").toString()));
 		}
 	}
 
 	/** MOC 203 */
-	private void testRecommendedFor(WebDriver driver, Product product) {
+	private void testRecommendedFor(WebDriver driver, Product product, Properties locator) {
 		logger.info("------testRecommendedFor-------");
 
 		try {
 			// Benefits - Recommended For
 			String BENEFITS = "Benefits";
 			String RECOMMENDED_FOR = "Recommended For";
-			WebElement benefitsTitle = driver.findElement(By.xpath("//*[@id='benefits']/h2"));
+
+			WebElement benefitsTitle = driver.findElement(By.xpath(locator.getProperty("benefits.title").toString()));
 			assertEquals(BENEFITS, benefitsTitle.getText());
 
-			WebElement recommendedForTitle = driver.findElement(By.xpath("//*[@id='benefits']/div[1]/div/h2"));
+			WebElement recommendedForTitle = driver
+					.findElement(By.xpath(locator.getProperty("recommendedFor.title").toString()));
+
 			assertEquals(RECOMMENDED_FOR, recommendedForTitle.getText());
 
 			String[] recommended = { "NORMAL", "DRY", "OILY", "ACNE SCARS", "BRIGHTENING", "DARK SPOTS" };
@@ -619,14 +642,15 @@ public class AddToCartGuest {
 	 * 
 	 * @throws CharacterLengthExceededException
 	 */
-	private void testWhatItis(WebDriver driver, Product product) throws CharacterLengthExceededException {
+	private void testWhatItis(WebDriver driver, Product product, Properties locator)
+			throws CharacterLengthExceededException {
 		logger.info("------testWhatItis-------");
 
 		try {
 			// whatsLabel
 			// Pure and Finest product
 			String WHATS_LABEL = "Pure and Finest product";
-			WebElement whatsEle = driver.findElement(By.xpath("//*[@id='product-content']/div[4]/p"));
+			WebElement whatsEle = driver.findElement(By.xpath(locator.getProperty("whatItis.text").toString()));
 			assertEquals(WHATS_LABEL, whatsEle.getText());
 			// char count 185 MAX
 			if (whatsEle.getText().length() > 185) {
@@ -643,12 +667,13 @@ public class AddToCartGuest {
 	 * 
 	 * @throws CharacterLengthExceededException
 	 */
-	private void testWhyItWorks(WebDriver driver, Product product) throws CharacterLengthExceededException {
+	private void testWhyItWorks(WebDriver driver, Product product, Properties locator)
+			throws CharacterLengthExceededException {
 		logger.info("------testWhyItWorks-------");
 
 		try {
 			// Title
-			WebElement testWiwTitle = driver.findElement(By.xpath("//*[@id='benefits']/div[2]/div/div/div/h2"));
+			WebElement testWiwTitle = driver.findElement(By.xpath(locator.getProperty("whyItworks.title").toString()));
 
 			// points
 			String WIW_POINT_NAME = "2 Types of Vitamin C";
@@ -672,25 +697,29 @@ public class AddToCartGuest {
 	}
 
 	/** MOC 206 */
-	private void testIngredient(WebDriver driver, Product product) {
+	private void testIngredient(WebDriver driver, Product product, Properties locator) {
 		logger.info("------testIngredient-------");
 
 		try {
+
 			// Title
-			WebElement ingrTitleEle = driver.findElement(By.xpath("//*[@id='ingredients']/h2"));
-			WebElement ingrDescEle = driver.findElement(By.xpath("//*[@id='ingredients']/div[1]/div/div/div[1]"));
+			WebElement ingrTitleEle = driver.findElement(By.xpath(locator.getProperty("ingredient.title").toString()));
+			WebElement ingrDescEle = driver.findElement(By.xpath(locator.getProperty("ingredient.desc").toString()));
 
 			// Formulated without:
 			WebElement ingrFormHeadEle = driver
-					.findElement(By.xpath("//*[@id='ingredients']/div[1]/div/div/div[2]/h5"));
-			WebElement ingrFormDescEle = driver.findElement(By.xpath("//*[@id='ingredients']/div[1]/div/div/div[2]"));
+					.findElement(By.xpath(locator.getProperty("formulatedWithout.heading").toString()));
+			WebElement ingrFormDescEle = driver
+					.findElement(By.xpath(locator.getProperty("formulatedWithout.desc").toString()));
 
 			// Full Ingredient List
-			WebElement fullIngrListEle = driver.findElement(By.xpath("//*[@id='ingredients']/div[1]/div/div/div[3]/a"));
+			WebElement fullIngrListEle = driver
+					.findElement(By.xpath(locator.getProperty("fullIngredient.list").toString()));
 
 		} catch (NoSuchElementException ne) {
 			logger.error("Ingredient Not present " + ne.toString());
 		}
+
 		// Spotlight Ingredients
 		for (int index = 2; index <= 4; index++) {
 			try {
@@ -712,7 +741,7 @@ public class AddToCartGuest {
 	}
 
 	/** MOC 207 */
-	private void testHadasei(WebDriver driver, Product product) {
+	private void testHadasei(WebDriver driver, Product product, Properties locator) {
 		logger.info("------testHadasei-------");
 		try {
 			// Hadasei-3
@@ -723,9 +752,9 @@ public class AddToCartGuest {
 			String HADASEI_TITLE = "Hadasei-3";
 			String HADASEI_DESC = "​Tatcha’s trinity of anti-aging superfoods reveals soft, youthful skin.";
 
-			WebElement hadaTitle = driver.findElement(By.xpath("//*[@id='ingredients']/div[5]/div/div/h2"));
+			WebElement hadaTitle = driver.findElement(By.xpath(locator.getProperty("hadasei.title").toString()));
 			assertEquals(HADASEI_TITLE, hadaTitle.getText());
-			WebElement hadaDesc = driver.findElement(By.xpath("//*[@id='ingredients']/div[5]/div/div/p"));
+			WebElement hadaDesc = driver.findElement(By.xpath(locator.getProperty("hadasei.desc").toString()));
 			assertEquals(HADASEI_DESC, hadaDesc.getText());
 
 			// Uji Green Tea
@@ -762,8 +791,8 @@ public class AddToCartGuest {
 			}
 		} catch (NoSuchElementException ne) {
 			logger.error("HADASEI Not Found " + ne.toString());
-		}catch (AssertionError e) {
-			logger.error("HADASEI >> "+e.toString());
+		} catch (AssertionError e) {
+			logger.error("HADASEI >> " + e.toString());
 			// TODO: handle exception
 		}
 	}
@@ -773,7 +802,8 @@ public class AddToCartGuest {
 	 * 
 	 * @throws CharacterLengthExceededException
 	 */
-	private void testHowToUse(WebDriver driver, Product product) throws CharacterLengthExceededException {
+	private void testHowToUse(WebDriver driver, Product product, Properties locator)
+			throws CharacterLengthExceededException {
 		logger.info("------testHowToUse-------");
 
 		try {
@@ -781,16 +811,20 @@ public class AddToCartGuest {
 			String HOW_USE_TITLE1 = "Suggested Usage";
 			String HOW_USE_TITLE2 = "Dosage";
 			String HOW_USE_TITLE3 = "Texture";
-			WebElement howUseTitle = driver.findElement(By.xpath("//*[@id='howTo']/h2"));
+
+			WebElement howUseTitle = driver.findElement(By.xpath(locator.getProperty("howToUse.title").toString()));
 			assertEquals(HOW_USE, howUseTitle.getText());
 
 			// *[@id='player_uid_596820346_1']
-			WebElement howUsePlayer = driver.findElement(By.xpath("//div[contains(@id,'player_uid')]"));
+			WebElement howUsePlayer = driver.findElement(By.xpath(locator.getProperty("howToUse.player").toString()));
 			howUsePlayer.click();
 
 			// Suggested Usage
-			WebElement howUseTitle1 = driver.findElement(By.xpath("//*[@id='howTo']/div/div/div/div[2]/h2[1]"));
-			WebElement howUseTitle1desc = driver.findElement(By.xpath("//*[@id='howTo']/div/div/div/div[2]/p[1]"));
+			WebElement howUseTitle1 = driver
+					.findElement(By.xpath(locator.getProperty("howToUse.usage.title").toString()));
+			WebElement howUseTitle1desc = driver
+					.findElement(By.xpath(locator.getProperty("howToUse.usage.desc").toString()));
+
 			assertEquals(HOW_USE_TITLE1, howUseTitle1.getText());
 			if (howUseTitle1desc.getText().length() > 200) {
 				throw new CharacterLengthExceededException(
@@ -798,16 +832,22 @@ public class AddToCartGuest {
 			}
 
 			// Dosage
-			WebElement howUseTitle2 = driver.findElement(By.xpath("//*[@id='howTo']/div/div/div/div[2]/h2[2]"));
-			WebElement howUseTitle2desc = driver.findElement(By.xpath("//*[@id='howTo']/div/div/div/div[2]/p[2]"));
+			WebElement howUseTitle2 = driver
+					.findElement(By.xpath(locator.getProperty("howToUse.dosage.title").toString()));
+			WebElement howUseTitle2desc = driver
+					.findElement(By.xpath(locator.getProperty("howToUse.dosage.desc").toString()));
 			assertEquals(HOW_USE_TITLE2, howUseTitle2.getText());
 			if (howUseTitle2desc.getText().length() > 100) {
 				throw new CharacterLengthExceededException(
 						"For Dosage: length of characters is greater than specified limit (100)");
 			}
+
 			// Texture
-			WebElement howUseTitle3 = driver.findElement(By.xpath("//*[@id='howTo']/div/div/div/div[2]/h2[3]"));
-			WebElement howUseTitle3desc = driver.findElement(By.xpath("//*[@id='howTo']/div/div/div/div[2]/p[3]"));
+			WebElement howUseTitle3 = driver
+					.findElement(By.xpath(locator.getProperty("howToUse.texture.title").toString()));
+			WebElement howUseTitle3desc = driver
+					.findElement(By.xpath(locator.getProperty("howToUse.texture.desc").toString()));
+
 			assertEquals(HOW_USE_TITLE3, howUseTitle3.getText());
 			if (howUseTitle3desc.getText().length() > 50) {
 				throw new CharacterLengthExceededException(
@@ -824,21 +864,23 @@ public class AddToCartGuest {
 	 * 
 	 * @throws CharacterLengthExceededException
 	 */
-	private void testPurityPromise(WebDriver driver, Product product) throws CharacterLengthExceededException {
+	private void testPurityPromise(WebDriver driver, Product product, Properties locator)
+			throws CharacterLengthExceededException {
 		logger.info("------testPurityPromise-------");
+
 		try {
 			String PP_TITLE = "Purity Promise";
 			// Image
-			WebElement ppImage = driver.findElement(By.xpath("//*[@id='main']/div[4]/div/div/div/p[1]/img"));
+			WebElement ppImage = driver.findElement(By.xpath(locator.getProperty("purityPromise.img").toString()));
 			ppImage.getSize().getHeight();
 			ppImage.getSize().getWidth();
 
 			// Title
-			WebElement ppTitle = driver.findElement(By.xpath("//*[@id='main']/div[4]/div/div/div/h2"));
+			WebElement ppTitle = driver.findElement(By.xpath(locator.getProperty("purityPromise.title").toString()));
 			assertEquals(PP_TITLE, ppTitle.getText());
 
 			// Description
-			WebElement ppDesc = driver.findElement(By.xpath("//*[@id='main']/div[4]/div/div/div/p[2]"));
+			WebElement ppDesc = driver.findElement(By.xpath(locator.getProperty("purityPromise.desc").toString()));
 			if (ppDesc.getText().length() > 200) {
 				throw new CharacterLengthExceededException(
 						"For Purity Promise: length of characters is greater than specified limit (200)");
