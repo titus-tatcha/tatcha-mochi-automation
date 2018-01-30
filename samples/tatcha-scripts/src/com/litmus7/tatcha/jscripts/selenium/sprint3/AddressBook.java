@@ -24,7 +24,7 @@ public class AddressBook {
      * @param locator
      * @throws Exception
      */
-    public void addressBook(WebDriver driver, Properties prop, Properties locator) throws Exception {
+    public void verifyAddressBook(WebDriver driver, Properties prop, Properties locator) throws Exception {
         if (getLoginHelper().isLoggedIn(driver)) {
             driver.findElement(By.xpath(locator.getProperty("account.address").toString())).click();
 
@@ -162,7 +162,7 @@ public class AddressBook {
                 state.selectByVisibleText(prop.getProperty("addressbook.state").toString());
             }
         } else {
-            addAddrStateElement = driver.findElement(By.xpath(locator.getProperty("addAddr.state").toString()));
+            addAddrStateElement = driver.findElement(By.xpath(locator.getProperty("addAddr.states").toString()));
             // Enter state if country is not US
             addAddrStateElement.clear();
             addAddrStateElement.sendKeys(prop.getProperty("addressbook.state").toString());
@@ -198,18 +198,22 @@ public class AddressBook {
         WebDriverWait wait = (WebDriverWait) new WebDriverWait(driver, 5);
         WebElement removeIconElement = driver.findElement(By.xpath(locator.getProperty("address.remove").toString()));
 
+        // Click 'X' to delete address
         removeIconElement.click();
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(locator.getProperty("removeAddr.confirm.title").toString())));
 
         WebElement confirmModalDialogeTitleElement = driver
                 .findElement(By.xpath(locator.getProperty("removeAddr.confirm.title").toString()));
-
+        
+        // Assert the title of dialogue box
         assertEquals("ARE YOU SURE?", confirmModalDialogeTitleElement.getText());
-
+        wait.until(ExpectedConditions.elementToBeClickable(By.linkText("DELETE")));
         WebElement confirmDeleteElement = driver
                 .findElement(By.cssSelector(locator.getProperty("removeAddr.confirm.button").toString()));
-
+              
+        // Confirm delete address
         confirmDeleteElement.click();
+        wait.until(ExpectedConditions.invisibilityOf(confirmModalDialogeTitleElement));
     }
 
     /**

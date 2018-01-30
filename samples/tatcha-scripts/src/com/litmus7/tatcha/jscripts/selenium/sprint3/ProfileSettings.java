@@ -27,9 +27,10 @@ public class ProfileSettings {
      * @param driver
      * @param prop
      * @param locator
+     * @param user
      * @throws Exception
      */
-    public void profileSettings(WebDriver driver, Properties prop, Properties locator, User user) throws Exception {
+    public void verifyProfileSettings(WebDriver driver, Properties prop, Properties locator, User user) throws Exception {
 
         WebDriverWait wait = (WebDriverWait) new WebDriverWait(driver, 5);
         if (getLoginHelper().isLoggedIn(driver)) {
@@ -93,6 +94,7 @@ public class ProfileSettings {
      * @param driver
      * @param prop
      * @param locator
+     * @param user
      */
     public void changePassword(WebDriver driver, Properties prop, Properties locator, User user) {
 

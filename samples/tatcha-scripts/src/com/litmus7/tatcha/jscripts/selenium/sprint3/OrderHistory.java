@@ -19,14 +19,14 @@ public class OrderHistory {
     private LoginHelper loginHelper = new LoginHelper();
 
     /**
-     * Handle payment option
+     * Handles order history
      * 
      * @param driver
      * @param prop
      * @param locator
      * @throws Exception
      */
-    public void orderHistory(WebDriver driver, Properties prop, Properties locator) throws Exception {
+    public void verifyOrderHistory(WebDriver driver, Properties prop, Properties locator) throws Exception {
         Actions actions = new Actions(driver);
 
         if (getLoginHelper().isLoggedIn(driver)) {
@@ -38,14 +38,11 @@ public class OrderHistory {
 
             List<WebElement> orderHistoryElement = driver.findElements(By.className("panel-title"));
             int noOfOrders = orderHistoryElement.size();
-            System.out.println("No of Orders : "+noOfOrders);
                     
             for(int i=1; i<=noOfOrders; i++) {
-                System.out.println("ROUND "+i+" STARTED");
                 // Get the Order Id
                 WebElement orderHistoryIdElement = driver.findElement(By.xpath("//*[@id='dwfrm_orders']/ul/li["+i+"]/div/div[1]/h5/a"));
                 String orderId = orderHistoryIdElement.getText();
-                System.out.println("Order Id : "+orderId);
 
                 // Assert Items
                 WebElement orderHistoryItemsLabelElement = driver.findElement(By.xpath("//*[@id='dwfrm_orders']/ul/li["+i+"]/div/div[2]/dl[2]/dt"));
@@ -64,13 +61,21 @@ public class OrderHistory {
                 WebElement viewDetailsButtonElement = driver.findElement(By.xpath("//*[@id='dwfrm_orders']/ul/li["+i+"]/div/div[3]/button"));
                 actions.moveToElement(viewDetailsButtonElement).click(viewDetailsButtonElement);
                 actions.perform();
-                orderDetails(driver, prop, locator, orderId, productNameList);
-                System.out.println("ROUND "+i+" COMPLETED");
+                verifyOrderDetails(driver, prop, locator, orderId, productNameList);
             }
         }
     }
 
-    private void orderDetails(WebDriver driver, Properties prop, Properties locator, String orderId, List<String> productNameList) {
+    /**
+     * Verify order details of each order
+     * 
+     * @param driver
+     * @param prop
+     * @param locator
+     * @param orderId
+     * @param productNameList
+     */
+    private void verifyOrderDetails(WebDriver driver, Properties prop, Properties locator, String orderId, List<String> productNameList) {
         WebDriverWait wait = (WebDriverWait) new WebDriverWait(driver, 10);
 
         // Assert Order Id
@@ -93,16 +98,12 @@ public class OrderHistory {
             String productName = orderDetailsItemElement.findElement(By.className(locator.getProperty("orderDetails.items.productName").toString())).getText();
             assertEquals(productNameList.get(i).toUpperCase(), productName);    
         } 
-        System.out.println("Step 1");
         // Go back to Order History page
         wait.until(ExpectedConditions.elementToBeClickable(By.xpath(locator.getProperty("orderDetails.back").toString())));
-        System.out.println("Step 2");
 
         driver.findElement(By.xpath(locator.getProperty("orderDetails.back").toString())).click();
-        System.out.println("Step 3");
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("h1.text-center")));
-        System.out.println("Order details verified");
     }
 
     /**

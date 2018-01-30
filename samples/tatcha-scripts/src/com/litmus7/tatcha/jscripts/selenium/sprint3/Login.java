@@ -23,7 +23,7 @@ public class Login {
     @Before
     public void setUp() throws Exception {
         prop.load(new FileInputStream(getClass().getResource("/tatcha.properties").getFile()));
-        locator.load(new FileInputStream(getClass().getResource("/elementLocator.properties").getFile()));
+        locator.load(new FileInputStream(getClass().getResource("/myAccountElementLocator.properties").getFile()));
         driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
         driver.get(baseUrl);
     }
@@ -38,14 +38,23 @@ public class Login {
         OrderHistory order = new OrderHistory();
                 
         try {
+            // User is logged in
             login(driver, prop, locator, user);
-//            profile.profileSettings(driver, prop, locator, user);
-//            driver.findElement(By.xpath(locator.getProperty("account.back").toString())).click();
-            address.addressBook(driver, prop, locator);
+            
+            // Assert and test profile settings in my account
+            profile.verifyProfileSettings(driver, prop, locator, user);
             driver.findElement(By.xpath(locator.getProperty("account.back").toString())).click();
-//            payment.paymentOptions(driver, prop, locator);
+            
+            // Assert and test address book in my account
+            address.verifyAddressBook(driver, prop, locator);
+            driver.findElement(By.xpath(locator.getProperty("account.back").toString())).click();
+            
+            // Assert and test payment options in my account - Cannot retrieve braintree fields
+//            payment.verifyPaymentOptions(driver, prop, locator);
 //            driver.findElement(By.xpath(locator.getProperty("account.back").toString())).click();
-            order.orderHistory(driver, prop, locator);
+            
+            // Assert and test order history in my account
+            order.verifyOrderHistory(driver, prop, locator);
             driver.findElement(By.xpath(locator.getProperty("account.back").toString())).click();
             
         } catch (NoSuchElementException ne) {
@@ -68,13 +77,13 @@ public class Login {
     }
 
     /**
-     * Checks for successful login
+     * Log-in registered user
      * 
      * @param driver
      * @param prop
      * @param locator
-     * @throws FileNotFoundException
-     * @throws IOException
+     * @param user
+     * @throws Exception
      */
     public void login(WebDriver driver, Properties prop, Properties locator, User user) throws Exception {
 
