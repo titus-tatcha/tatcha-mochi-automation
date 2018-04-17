@@ -3,6 +3,8 @@ package com.litmus7.tatcha.jscripts.selenium.sprint3;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Properties;
+
+import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -14,7 +16,7 @@ public class AddressBook {
     
     public static final String COUNTRY_US = "United States";
     private LoginHelper loginHelper = new LoginHelper();
-
+    private final static Logger logger = Logger.getLogger(AddressBook.class);
 
     /**
      * Handles address book
@@ -44,40 +46,40 @@ public class AddressBook {
             // Add Address to address book
             driver.findElement(By.xpath(locator.getProperty("address.add.button").toString())).click();
             addAddress(driver, prop, locator, false);
-            System.out.println("Address Added");
+            logger.info("Address Added");
 
             // Add Address to address book, which will become the default
             // address
             driver.findElement(By.xpath(locator.getProperty("address.add.button").toString())).click();
             addAddress(driver, prop, locator, false);
-            System.out.println("Address Added");
+            logger.info("Address Added");
 
             // Edit default address
             driver.findElement(By.xpath(locator.getProperty("address.default.edit").toString())).click();
             addAddress(driver, prop, locator, true);
-            System.out.println("Address Edited");
+            logger.info("Address Edited");
 
-             // Edit an address in address book
-             driver.findElement(By.xpath(locator.getProperty("address.edit").toString())).click();
-             addAddress(driver, prop, locator, false);
-             System.out.println("Address Edited");
+            // Edit an address in address book
+            driver.findElement(By.xpath(locator.getProperty("address.edit").toString())).click();
+            addAddress(driver, prop, locator, false);
+            logger.info("Address Edited");
 
             // Make an address the default address
             WebElement makeDefaultButtonElement = null;
             makeDefaultButtonElement = driver
                     .findElement(By.xpath(locator.getProperty("address.makeDefault").toString()));
             makeDefaultButtonElement.click();
-            System.out.println("Address set as default");
+            logger.info("Address set as default");
 
             // Make an address the default address
             makeDefaultButtonElement = driver
                     .findElement(By.xpath(locator.getProperty("address.makeDefault").toString()));
             makeDefaultButtonElement.click();
-            System.out.println("Address set as default");
+            logger.info("Address set as default");
 
             // Remove default address from address book
             removeAddress(driver, prop, locator);
-            System.out.println("Address removed");
+            logger.info("Address removed");
         }
     }
 
@@ -98,6 +100,28 @@ public class AddressBook {
         if ("ADD ADDRESS".equalsIgnoreCase(title)) {
             isAddAddress = true;
         }
+        
+        populateAddressBook(driver, prop, locator, isEditDefaultAddress, isAddAddress);
+        
+        // Save address
+        WebElement addAddressSaveButtonElement = driver
+                .findElement(By.xpath(locator.getProperty("addAddr.save.button").toString()));
+        addAddressSaveButtonElement.click();
+    }
+
+    /**
+     * Populate the fields of address book
+     * 
+     * @param driver
+     * @param prop
+     * @param locator
+     * @param isEditDefaultAddress
+     * @param isAddAddress
+     */
+    public String populateAddressBook(WebDriver driver, Properties prop, Properties locator,
+            boolean isEditDefaultAddress, boolean isAddAddress) {
+        
+        WebDriverWait wait = (WebDriverWait) new WebDriverWait(driver, 5);
 
         // Get all the web elements in the address book
         WebElement addAddrFirstNameElement = driver
@@ -110,14 +134,12 @@ public class AddressBook {
         WebElement addAddr2Element = driver.findElement(By.xpath(locator.getProperty("addAddr.addr2").toString()));
         WebElement addAddrZipCodeElement = driver
                 .findElement(By.xpath(locator.getProperty("addAddr.zipCode").toString()));
-        WebElement addAddrCityElement = driver.findElement(By.xpath(locator.getProperty("addAddr.city").toString()));
         WebElement addAddrPhoneElement = driver.findElement(By.xpath(locator.getProperty("addAddr.phone").toString()));
-        WebElement addAddressSaveButtonElement = driver
-                .findElement(By.xpath(locator.getProperty("addAddr.save.button").toString()));
 
         // Get Address Id
         WebElement addressIdElement = driver.findElement(By.id("dwfrm_profile_address_addressid"));
         String addressId = addressIdElement.getAttribute("value");
+        logger.info("Id of the Address added : "+addressId);
 
         // Populate first and last name
         addAddrFirstNameElement.clear();
@@ -144,28 +166,33 @@ public class AddressBook {
             addAddr1Element.sendKeys(prop.getProperty("addressbook.addr1").toString());
             addAddr2Element.clear();
             addAddr2Element.sendKeys(prop.getProperty("addressbook.addr2").toString());
-
-            // Populate zip code and city
-            addAddrZipCodeElement.clear();
-            addAddrZipCodeElement.sendKeys(prop.getProperty("addressbook.pin").toString());
         }
-
-        addAddrCityElement.clear();
-        addAddrCityElement.sendKeys(prop.getProperty("addressbook.city").toString());
+        
+        // Populate zip code and city
+        addAddrZipCodeElement.clear();
+        addAddrZipCodeElement.sendKeys(prop.getProperty("addressbook.pin").toString());
+        wait.until(ExpectedConditions.textToBePresentInElementValue(addAddrZipCodeElement, prop.getProperty("addressbook.pin").toString()));
+        WebElement addAddrCityElement = driver.findElement(By.xpath(locator.getProperty("addAddr.city").toString()));
+        if(addAddrCityElement.getAttribute("value").isEmpty()) {
+            addAddrCityElement.clear();
+            addAddrCityElement.sendKeys(prop.getProperty("addressbook.city").toString());
+        }
 
         WebElement addAddrStateElement = null;
         if (COUNTRY_US.equals(countryValue)) {
             addAddrStateElement = driver.findElement(By.xpath(locator.getProperty("addAddr.states").toString()));
             // Select State if country is US
             Select state = new Select(addAddrStateElement);
-            if (addAddrStateElement.isEnabled()) {
+            if (!addAddrStateElement.isSelected()) {
                 state.selectByVisibleText(prop.getProperty("addressbook.state").toString());
             }
         } else {
             addAddrStateElement = driver.findElement(By.xpath(locator.getProperty("addAddr.states").toString()));
-            // Enter state if country is not US
-            addAddrStateElement.clear();
-            addAddrStateElement.sendKeys(prop.getProperty("addressbook.state").toString());
+            if(addAddrStateElement.getAttribute("value").isEmpty()) {
+                // Enter state if country is not US
+                addAddrStateElement.clear();
+                addAddrStateElement.sendKeys(prop.getProperty("addressbook.state").toString());
+            }
         }
 
         if (isAddAddress) {
@@ -182,9 +209,7 @@ public class AddressBook {
                 }
             }
         }
-
-        // Save address
-        addAddressSaveButtonElement.click();
+        return addressId;
     }
 
     /**

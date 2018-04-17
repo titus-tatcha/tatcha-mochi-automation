@@ -53,6 +53,8 @@ public class MyLogin {
 	    String LOGIN = prop.get("login.button.id").toString();
 	    	    
 	    WebElement login_link = driver.findElement(By.cssSelector("a[href*='tatcha/account']"));
+	    
+	    
 	    login_link.click();
 	    
 	    WebElement login_username = driver.findElement(By.xpath("//*[contains(@id,'"+USERNAME+"')]"));

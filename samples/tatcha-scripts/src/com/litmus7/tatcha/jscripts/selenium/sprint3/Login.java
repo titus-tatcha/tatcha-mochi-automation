@@ -9,11 +9,16 @@ import org.junit.*;
 import static org.junit.Assert.*;
 import org.openqa.selenium.*;
 
+import com.litmus7.tatcha.jscripts.commons.TestMethods;
 import com.litmus7.tatcha.jscripts.dob.User;
 import com.litmus7.tatcha.utils.BrowserDriver;
+import com.xceptance.xlt.api.webdriver.XltChromeDriver;
+import com.xceptance.xlt.api.webdriver.XltDriver;
 
 public class Login {
     private WebDriver driver = BrowserDriver.getChromeWebDriver();
+//    private WebDriver driver = new XltChromeDriver();
+//    private WebDriver driver = new XltDriver();
     private String baseUrl = BrowserDriver.BASE_URL;
     private boolean acceptNextAlert = true;
     private StringBuffer verificationErrors = new StringBuffer();
@@ -30,6 +35,7 @@ public class Login {
 
     @Test
     public void testLogin() throws Exception {
+    	TestMethods.getInstance().testNewsLetterPopupModal(driver);
         User user = new User();
 
         ProfileSettings profile = new ProfileSettings();

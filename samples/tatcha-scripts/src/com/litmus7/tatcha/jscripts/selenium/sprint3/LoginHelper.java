@@ -1,5 +1,6 @@
 package com.litmus7.tatcha.jscripts.selenium.sprint3;
 
+import static org.junit.Assert.assertEquals;
 import java.util.HashMap;
 
 import org.openqa.selenium.By;
@@ -7,11 +8,13 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 
 public class LoginHelper {
 
     // Holds the user details, such as first name
     public HashMap<String, String> userDetails = new HashMap<String, String>();
+    private final static Logger logger = Logger.getLogger(LoginHelper.class);
 
     /**
      * Method to determine is a user is logged in or not
@@ -81,6 +84,24 @@ public class LoginHelper {
             price = Double.parseDouble(priceString.substring(1, priceString.length()));
         }
         return price;
+    }
+    
+    public void logAssertion(String className, String expected, String actual) {
+        try {
+            assertEquals(expected, actual);
+            logger.info(className+" :: ASSERTION IS TRUE");
+        } catch(AssertionError ae) {
+            logger.error(className+" :: "+ae.toString());
+        }
+    }
+    
+    public void logAssertion(String className, boolean expected) {
+        try {
+            assert(expected);
+            logger.info(className+" :: ASSERTION HOLDS TRUE");
+        } catch(AssertionError ae) {
+            logger.error(className+" :: "+ae.toString());
+        }
     }
     
     /**

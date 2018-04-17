@@ -28,6 +28,7 @@ import com.litmus7.tatcha.jscripts.selenium.exception.CharacterLengthExceededExc
 import com.litmus7.tatcha.jscripts.selenium.exception.InvalidElementException;
 import com.litmus7.tatcha.jscripts.selenium.exception.ProductNotFoundException;
 import com.litmus7.tatcha.utils.BrowserDriver;
+import com.litmus7.tatcha.utils.ClassUtils;
 
 public class AddToCartGuest {
 	private WebDriver driver;
@@ -48,7 +49,7 @@ public class AddToCartGuest {
 		// driver = new FirefoxDriver();
 		// baseUrl = "https://development-na01-tatcha.demandware.net/";
 		driver = BrowserDriver.getChromeWebDriver();
-		baseUrl = BrowserDriver.BASE_URL;
+		baseUrl = BrowserDriver.STAGE_URL;
 		driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 	}
 
@@ -79,46 +80,28 @@ public class AddToCartGuest {
 		locator.load(new FileInputStream(getClass().getResource("/elementLocator.properties").getFile()));
 		prop.load(new FileInputStream(getClass().getResource("/tatcha.properties").getFile()));
 
-		Product product = new Product();
+		String[] productsNames = prop.getProperty("product.names").toString().split("\\|");
 
-		/** ------------ Adding Products to Mini Cart ------------ */
-		Actions action = new Actions(driver);
-//		int prodCount = 3;
-
-		String[] products = prop.getProperty("product.names").toString().split("\\|");
-
-		// productNames.add("ONE STEP CAMELLIA CLEANSING OIL");
-
-		WebDriverWait wait = (WebDriverWait) new WebDriverWait(driver, 3);
-		for (String productName : products) {
-
-			/** Find product by hovering shop all - works only for Page one */
-
-			// wait.until(ExpectedConditions.visibilityOfElementLocated((By.linkText("SHOP"))));
-			// try{
-			// WebElement element = driver.findElement(By.linkText("SHOP"));
-			// action.moveToElement(element).build().perform();
-			// driver.findElement(By.linkText("Shop All")).click();
-			// /** now only the first page items are selected since PROD page
-			// not in this sprint */
-			//
-			// driver.findElement(By.cssSelector("img[alt=\""+productName+"\"]")).click();
-			//
-			// }catch(NoSuchElementException ne){
-			// logger.error("No Element >> "+ne.toString());
-			// searchProduct(driver,productName);
-			// }
+		for (String productName : productsNames) {
 
 			/** Find product by Search Filter */
-			searchProduct(driver, productName);
-
+			// create product
+			Product product = createProduct(productName.trim());
+//			hoverShopAll(driver, product.getName());
+			searchProduct(driver, product.getName());
+			addItemToCart(driver, product, locator);
+			gotoCart(driver, product, locator);
+			gotoCheckoutLogin(driver, product, locator);
+			
 			// going to PDP
-			product.setPid("P" + (productId++));
-			product.setName(productName);
-			testPDPforGuest(driver, product, locator);
+			// testPDPforGuest(driver, product, locator);
 			// testBAGforGuest(driver, prodList);
+			
 		}
 
+		
+		//*[@id='mini-cart']/div[1]/a/svg
+		
 		// Mini Cart item count
 		String itemCount = driver.findElement(By.cssSelector("div.badge.bag-count")).getText();
 		logger.info("Item Count" + itemCount);
@@ -131,8 +114,76 @@ public class AddToCartGuest {
 		logger.info("subTotal " + subTotal);
 
 		/** ----------------------- Mini Cart Checkings ------------------- */
-		// checking items
+//		checkMiniCart(driver, prodList, locator);
 
+		// driver.findElement(By.linkText("Select Free Samples")).click();
+		// assertEquals("SHOPPING BAG",
+		// driver.findElement(By.cssSelector("h1")).getText());
+
+		// driver.findElement(By.linkText("Checkout")).click();
+		// assertEquals("Select an Address",
+		// driver.findElement(By.cssSelector("div.select-address.form-row >
+		// label")).getText());
+		// click to Bag Page
+		// ERROR: Caught exception [Error: locator strategy either id or name
+		// must be specified explicitly.]
+	}
+
+	/**
+	 * Hovering Shop All Menu Link
+	 * 
+	 * @param driver
+	 * @param productName
+	 */
+	private void hoverShopAll(WebDriver driver, String productName) {
+		/** Find product by hovering shop all - works only for Page one */
+		WebDriverWait wait = (WebDriverWait) new WebDriverWait(driver, 3);
+		Actions action = new Actions(driver);
+		wait.until(ExpectedConditions.visibilityOfElementLocated((By.linkText("SHOP"))));
+		try {
+			WebElement element = driver.findElement(By.linkText("SHOP"));
+			action.moveToElement(element).build().perform();
+			driver.findElement(By.linkText("Shop All")).click();
+			/**
+			 * now only the first page items are selected since PROD page not in
+			 * this sprint
+			 */
+
+			driver.findElement(By.cssSelector("img[alt=\"" + productName + "\"]")).click();
+
+		} catch (NoSuchElementException ne) {
+			logger.error("No Element >> " + ne.toString());
+			// searchProduct(driver,productName);
+		}
+
+	}
+
+	/**
+	 * Create Product object
+	 * @param productName
+	 * @return
+	 */
+	private Product createProduct(String productName) {
+		Product product = new Product();
+		String pkidStart;
+		int PKBEGINLIMIT = 4;
+		if (null != productName && productName.trim().length() >= PKBEGINLIMIT) {
+			pkidStart = productName.substring(0, 4);
+		} else {
+			pkidStart = "PROD";
+		}
+		product.setPid(pkidStart + (ClassUtils.getInstance().getPK()));
+		// product.setPid("P" + (productId++));
+		product.setName(productName);
+		return product;
+	}
+
+	/**
+	 * Check Mini Cart
+	 */
+	private void checkMiniCart(WebDriver driver, List<Product> prodList, Properties locator) {
+		WebDriverWait wait = (WebDriverWait) new WebDriverWait(driver, 3);
+		Actions action = new Actions(driver);
 		int cartItem = 1;
 		prodList.size();
 		for (Product prod : prodList) {
@@ -161,25 +212,72 @@ public class AddToCartGuest {
 				// assertEquals("Qty: 1 | $85.50",
 				// driver.findElement(By.cssSelector("div.dropdown-bag-item-qty-price")).getText());
 
+				// CTA Checkout
+				checkoutLogin(driver, prod);
+
 			} catch (NoSuchElementException ne) {
 				logger.error("No Element >> " + ne.toString());
 			}
 
 		}
-
-		driver.findElement(By.linkText("Select Free Samples")).click();
-		assertEquals("SHOPPING BAG", driver.findElement(By.cssSelector("h1")).getText());
-
-		// CTA Checkout
-		checkoutLogin(driver, product);
-		// driver.findElement(By.linkText("Checkout")).click();
-		assertEquals("Select an Address",
-				driver.findElement(By.cssSelector("div.select-address.form-row > label")).getText());
-		// click to Bag Page
-		// ERROR: Caught exception [Error: locator strategy either id or name
-		// must be specified explicitly.]
 	}
 
+	/**
+	 * Add Each Item to Cart
+	 * @param driver
+	 * @param product
+	 * @param locator
+	 */
+	private void addItemToCart(WebDriver driver, Product product, Properties locator) {
+		
+		/** Adding to Cart */
+//		WebElement cartEle = driver.findElement(By.xpath("//*[@id='add-to-cart']"));
+		WebElement addItemButton = driver.findElement(By.xpath(locator.getProperty("addToCart.button").toString()));
+		addItemButton.click();
+		
+	}
+	
+	//*[@id="primary"]/div[1]/div/h1
+	
+
+	/**
+	 * Go to Bag Page
+	 * @param driver
+	 * @param product
+	 * @param locator
+	 */
+	private void gotoCart(WebDriver driver, Product product, Properties locator){	
+		WebDriverWait wait = (WebDriverWait) new WebDriverWait(driver, 3);
+		By byeEle = By.xpath("//*[@id='mini-cart']/div[1]/a");
+		wait.until(ExpectedConditions.visibilityOfElementLocated(byeEle));
+
+		WebElement element = driver.findElement(byeEle);
+		element.click();
+		
+	}
+	
+	private void gotoCheckoutLogin(WebDriver driver, Product product, Properties locator){
+		
+//		WebElement checkoutButton = driver.findElement(By.xpath(""));
+//		checkoutButton.click();
+		
+		WebDriverWait wait = (WebDriverWait) new WebDriverWait(driver, 3);
+//		By byeEle = By.xpath("//*[@id='cart-table']/div[2]/div/div[2]/button");
+//		By byeEle = By.xpath("//*[contains(@id,'cart-table')]");
+		By checkout = By.xpath("//*[contains(@type,'submit') and contains(@value,'Checkout')]");
+		wait.until(ExpectedConditions.visibilityOfElementLocated(checkout));
+
+		WebElement element = driver.findElement(checkout);
+		element.click();
+		
+		//*[@id="cart-table"]/div[2]/div/div[2]/button 
+//		#cart-table > div.col-md-4 > div > div.panel-body > button
+		
+		//*[@id="cart-table"]/div[2]/div/div[2]/button
+//		<button class="btn btn-primary btn-lg btn-block" type="submit" value="Checkout" name="dwfrm_cart_checkoutCart">
+//		Checkout
+//		</button>
+	}
 	/**
 	 * Search Filter
 	 * 
@@ -219,7 +317,7 @@ public class AddToCartGuest {
 			String marketFlag1 = flag1Ele1.getText().trim();
 			// *[@id="pdpMain"]/div[1]/div[1]/div/span[1]
 			// *[@id="pdpMain"]/div[1]/div[1]/div/span[3]
-			
+
 			WebElement flag1Ele2 = driver.findElement(By.xpath(locator.getProperty("marketingFlag.two").toString()));
 			String marketFlag2 = flag1Ele2.getText().trim();
 
@@ -270,7 +368,6 @@ public class AddToCartGuest {
 			logger.error(" No Marketing Banner !!! ");
 		}
 
-		
 		// Product Title
 		try {
 			WebElement prodTitleEle = driver
@@ -278,7 +375,7 @@ public class AddToCartGuest {
 			String prodTitle = prodTitleEle.getText().toLowerCase();
 			assert (prodTitle.contains(product.getName().toLowerCase()));
 		} catch (NoSuchElementException ne) {
-			logger.error(" No Title !!! "+ne.toString());
+			logger.error(" No Title !!! " + ne.toString());
 		}
 		// Subtitle
 		try {
@@ -286,7 +383,7 @@ public class AddToCartGuest {
 					By.cssSelector("div.product-summary-desktop > h1.product-name > span.product-subtitle"));
 			product.setSubtitle(prodsubtitleEle.getText());
 		} catch (NoSuchElementException ne) {
-			logger.error(" No Subtitle !!! "+ne.toString());
+			logger.error(" No Subtitle !!! " + ne.toString());
 		}
 		// assertEquals(product.getSubtitle().toLowerCase(),
 		// prodsubtitleEle.getText().toLowerCase());
@@ -294,11 +391,9 @@ public class AddToCartGuest {
 		// driver.findElement(By.cssSelector("div.product-summary-desktop >
 		// h1.product-name > span.product-subtitle")).getText());
 
-				
 		// Product Price
 		String SPLITTER = "-";
-		String productPrice = driver.findElement(By.xpath(locator.getProperty("product.price").toString()))
-				.getText();
+		String productPrice = driver.findElement(By.xpath(locator.getProperty("product.price").toString())).getText();
 		if (productPrice.contains(SPLITTER)) { // $15.00 - $45.00
 			String[] lowhighPrices = productPrice.split(SPLITTER);
 			String lowPrice = lowhighPrices[0].trim();
@@ -319,9 +414,7 @@ public class AddToCartGuest {
 
 		boolean skinValidity = false;
 		try {
-			
 
-					
 			String[] skinVariants = { "Normal", "Combination", "Dry", "Sensitive", "Oily" };
 			WebElement skinTitle = driver.findElement(By.xpath(locator.getProperty("product.skinVariant").toString()));
 
@@ -342,7 +435,7 @@ public class AddToCartGuest {
 		} catch (NoSuchElementException ne) {
 			/** Skin Variants not present */
 			skinValidity = true;
-			logger.error(" No Skin Variant !!! "+ne.toString());
+			logger.error(" No Skin Variant !!! " + ne.toString());
 		}
 
 		// Size
@@ -351,7 +444,7 @@ public class AddToCartGuest {
 
 		boolean sizeValidity = false;
 		try {
-					
+
 			String[] sizeVariants = { "60g / 2.1 oz.", "10g / .35 oz." };
 			WebElement sizeTitle = driver.findElement(By.xpath(locator.getProperty("product.sizeVariant").toString()));
 			if (null != sizeTitle.getText() && "size".equalsIgnoreCase(sizeTitle.getText())) {
@@ -371,7 +464,7 @@ public class AddToCartGuest {
 		} catch (NoSuchElementException ne) {
 			/** Size Variants not present */
 			sizeValidity = true;
-			logger.error(" No Size Varient !!! "+ne.toString());
+			logger.error(" No Size Varient !!! " + ne.toString());
 		}
 
 		/** Raising Invalid Skin & Size Variants as Exceptions */
@@ -399,7 +492,7 @@ public class AddToCartGuest {
 
 		} catch (NoSuchElementException ne) {
 			notifyQty = true;
-			logger.error(" No Notify Message !!! "+ne.toString());
+			logger.error(" No Notify Message !!! " + ne.toString());
 		}
 
 		// Throw exception if quantity notify msg is invalid
@@ -416,7 +509,7 @@ public class AddToCartGuest {
 			// driver.findElement(By.id("Quantity")).getText());
 		} catch (NoSuchElementException ne) {
 			logger.error("No Quantity DDL : " + ne.toString());
-			
+
 		}
 
 		// Limit Quantity Message
@@ -473,7 +566,7 @@ public class AddToCartGuest {
 			// WebElement reviewEle =
 			// driver.findElement(By.xpath("//*[@id='product-content']/div[2]/div[2]/div[2]/a"));
 			WebElement reviewEle = driver.findElement(By.xpath(locator.getProperty("product.reviews").toString()));
-			
+
 			String reviews = reviewEle.getText();
 			assertEquals("9,999 Reviews", reviews);
 
@@ -483,7 +576,6 @@ public class AddToCartGuest {
 			// throw ne;
 		}
 
-		
 		// Main Image & Thumbnails
 		// boolean imgValidity = false;
 		try {
@@ -529,12 +621,13 @@ public class AddToCartGuest {
 		String OR_FB_LABEL = "Or login/register with Facebook.";
 
 		driver.findElement(By.linkText("Checkout")).click();
-		
+
 		WebElement chkLoginTitle = driver.findElement(By.xpath(locator.getProperty("checkoutLogin.title").toString()));
 		assertEquals(CL_TITLE, chkLoginTitle.getText());
 		WebElement chkLoginDesc = driver.findElement(By.xpath(locator.getProperty("checkoutLogin.desc").toString()));
 		assertEquals(CL_TITLE, chkLoginDesc.getText());
-		WebElement email_label = driver.findElement(By.xpath(locator.getProperty("checkoutLogin.email.label").toString()));
+		WebElement email_label = driver
+				.findElement(By.xpath(locator.getProperty("checkoutLogin.email.label").toString()));
 		assertEquals(EMAIL_LABEL, email_label.getText());
 		WebElement email = driver.findElement(By.xpath(locator.getProperty("checkoutLogin.emailid").toString()));
 		assertEquals(EMAIL, email.getText());
@@ -544,7 +637,7 @@ public class AddToCartGuest {
 		// <input id="email" placeholder="beautiful@tatcha.com">
 
 		// Or
-		
+
 		WebElement or_fb_lbl = driver.findElement(By.xpath(locator.getProperty("checkoutLogin.fb.label").toString()));
 		assertEquals(OR_FB_LABEL, or_fb_lbl.getText());
 
@@ -568,19 +661,22 @@ public class AddToCartGuest {
 		String ENTER_PWD = "Welcome back, " + FIRST_NAME + ". Please enter your password to continue.";
 		String PASSWORD_LBL = "PASSWORD";
 		String FORGOT_PASSWORD_LBL = "Forgot Your Password?";
-		
-		WebElement pwdEnter = driver.findElement(By.xpath(locator.getProperty("checkoutLogin.password.enter").toString()));
+
+		WebElement pwdEnter = driver
+				.findElement(By.xpath(locator.getProperty("checkoutLogin.password.enter").toString()));
 		assertEquals(ENTER_PWD, pwdEnter.getText());
 
 		WebElement pwdTitle = driver
 				.findElement(By.xpath(locator.getProperty("checkoutLogin.password.title").toString()));
 		assertEquals(PASSWORD_LBL, pwdTitle.getText());
 
-		WebElement password = driver.findElement(By.xpath(locator.getProperty("checkoutLogin.password.text").toString()));
+		WebElement password = driver
+				.findElement(By.xpath(locator.getProperty("checkoutLogin.password.text").toString()));
 		assertEquals(PASSWORD, password.getText());
 
 		// Forgot Your Password?
-		WebElement forgotPwdEle = driver.findElement(By.xpath(locator.getProperty("checkoutLogin.password.forgot").toString()));
+		WebElement forgotPwdEle = driver
+				.findElement(By.xpath(locator.getProperty("checkoutLogin.password.forgot").toString()));
 		assertEquals(FORGOT_PASSWORD_LBL, forgotPwdEle.getText());
 		forgotPwdEle.click();
 

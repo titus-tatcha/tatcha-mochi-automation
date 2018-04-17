@@ -19,6 +19,7 @@ import org.openqa.selenium.safari.SafariOptions;
 
 import com.xceptance.xlt.api.engine.scripting.AbstractScriptTestCase;
 import com.xceptance.xlt.api.engine.scripting.ScriptName;
+import com.xceptance.xlt.api.webdriver.XltChromeDriver;
 
 /*
  * FF and GC browser drivers with System settings
@@ -34,10 +35,16 @@ public class BrowserDriver extends AbstractScriptTestCase {
 	
 //	 public static final String BASE_URL = "https://52.43.54.174/mocha/tatcha-bootstrap3/src/prototype-wrapper.html";
 //	 public static final String PROTOTYPE_URL = "http://52.43.54.174/mocha/tatcha-bootstrap3/src/prototype-wrapper.html";
-	 public static final String BASE_URL ="http://development-na01-tatcha.demandware.net/on/demandware.store/Sites-tatcha-Site";
+	 public static final String BASE_URL_OLD ="http://development-na01-tatcha.demandware.net/on/demandware.store/Sites-tatcha-Site";
 	 public static final String DEMO_URL = "http://demo-na01-tatcha.demandware.net/on/demandware.store/Sites-tatcha-Site";
-//	 public static final String QA_URL = "http://demo-na01-tatcha.demandware.net/on/demandware.store/Sites-tatcha-Site";
-	 
+	 public static final String DEV_URL ="http://development-na01-tatcha.demandware.net/s/tatcha/home?lang=default";
+//	 public static final String DEV_URL ="http://storefront:Tatcha123@development-na01-tatcha.demandware.net/s/tatcha/home?lang=default";
+
+	 public static final String STAGE_URL = "http://staging-na01-tatcha.demandware.net/s/tatcha/home?lang=default";
+	 public static final String PROD_URL = "http://production-na01-tatcha.demandware.net/s/tatcha/home?lang=default";
+	 public static final String PREV_URL = "https://preview.tatcha.net/home?lang=default";
+	 public static final String BASE_URL = DEV_URL;
+	
 	public static WebDriver getFireFoxWebDriver(){
         capabilities = DesiredCapabilities.firefox();
         
@@ -63,6 +70,17 @@ public class BrowserDriver extends AbstractScriptTestCase {
         return driver;
  	}
  	
+	
+	public static WebDriver getXLTChromeWebDriver(){
+		capabilities = DesiredCapabilities.chrome();
+	      System.setProperty("webdriver.chrome.bin", "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe");
+	      System.setProperty("webdriver.chrome.driver", "D:/project/SeleniumTestScripts/chromedriver_win32/chromedriver.exe");
+		driver = new XltChromeDriver(capabilities);
+
+		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		return driver;
+	}
+	
 	public WebDriver getSafariWebDriver(){
 // 		System.setProperty("webdriver.safari.bin", "D:/programs/Safari/Safari.exe");
 // 		capabilities = DesiredCapabilities.safari();
