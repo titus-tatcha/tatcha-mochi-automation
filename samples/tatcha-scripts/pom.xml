@@ -15,15 +15,59 @@
 	<build>
 
 		<resources>
+			<!-- Resource Folder  -->
 			<resource>
 				<directory>src/com/litmus7/tatcha/data</directory>
+				<filtering>true</filtering>
+				
 			</resource>
+			
+			<!-- To Write Versions  -->
+			<!-- 
+			<resource>
+		      <directory>src/main/resources</directory>
+		      <filtering>true</filtering>
+		      <includes>
+		        <include>**/version.txt</include>
+		      </includes>
+		    </resource>
+		    <resource>
+		      <directory>src/main/resources</directory>
+		      <filtering>false</filtering>
+		      <excludes>
+		        <exclude>**/version.txt</exclude>
+		      </excludes>
+		    </resource -->
+						
 		</resources>
 
 		<!-- <sourceDirectory>src</sourceDirectory> -->
 		<testSourceDirectory>src</testSourceDirectory>
 		<plugins>	
 		
+			<!-- To write Version -->
+			
+		    <!--   
+		      <plugin>
+		        <artifactId>maven-antrun-plugin</artifactId>
+		         <version>1.4</version>
+		         <executions>
+		          <execution>
+		            <phase>process-resources</phase>
+		            <configuration>
+		               <tasks>
+		                 <copy file="${project.build.outputDirectory}/version.txt"
+		                   toFile="..." overwrite="true" />
+		              </tasks>
+		            </configuration>
+		            <goals>
+		              <goal>run</goal>
+		            </goals>
+		          </execution>
+		        </executions>
+		      </plugin> 
+		     -->
+   
 		 <!-- 
 	      <plugin>
 	        <groupId>org.codehaus.mojo</groupId>
@@ -87,10 +131,10 @@
 						<include>com/litmus7/tatcha/jscripts/selenium/login/MyLoginWithFB.java</include> 
 						<include>com/litmus7/tatcha/jscripts/selenium/login/Register.java</include> 
 						<include>com/litmus7/tatcha/jscripts/selenium/login/RegisterWithFB.java</include> 			
-						-->
+						
 						<include>com/litmus7/tatcha/jscripts/selenium/navigation/Test_Header.java</include> 
 						<include>com/litmus7/tatcha/jscripts/selenium/navigation/Test_Footer.java</include> 
-							
+						-->	
 						<!-- Sprint 4 -->	
 						 <!--
 						<include>com/litmus7/tatcha/jscripts/selenium/sprint4/AddToCartGuestUser.java</include> --><!--  shopping bag  -->
@@ -99,6 +143,7 @@
 						<!--
 						<include>com/litmus7/tatcha/jscripts/selenium/sprint5/AddToCartGuest.java</include> 
 						-->
+						<include>com/litmus7/tatcha/jscripts/selenium/sprint5/PLP.java</include> 
 						
 						<!-- Sprint 6 -->
 						 <!--	<include>com/litmus7/tatcha/jscripts/selenium/sprint6/AddItemToCart.java</include>    -->
@@ -129,8 +174,45 @@
 			            <!--  <test.type>load.xlt</test.type>      -->
 			             <test.type>browser.chrome</test.type>  
 			             
-			             <base.url>http://development-na01-tatcha.demandware.net/s/tatcha/home?lang=default</base.url>	  
-			             <work.env>dev</work.env>	    
+			             <work.env>DEV_SEC</work.env>	
+			             
+			             <work.module>BESTSELLERS</work.module>    
+								<!-- 	SHOPALL
+										MOIST
+										CLEANS
+										FACE
+										MASKS
+										ESSENCE
+										EYE
+										LIP
+										MAKEUP
+										PRIMING
+										BODY
+										BLOTTING
+										NORMALDRY
+										NORMALOILY
+										DRY
+										SENSITIVE
+										BESTSELLERS
+										NEW
+										GIFTSETS
+										GIFTPURCHASE
+										GIFTPOUCH
+										OURSTORY
+										NATURAL
+										TIPS
+										GIVING -->
+									
+			             <product.name>WATERCREAM</product.name>
+							<!-- 	 SILKCANVAS
+						             PCOIL
+									 PCOIL.TRAVEL
+									 PINKSTARTER.NORMDRY
+									 REDLIP
+									 DPCLEANSE 
+									 WATERCREAM
+							-->
+							
 			             <!--    
 			             <work.env>staging</work.env>	
 						 <base.url>http://staging-na01-tatcha.demandware.net/s/tatcha/home?lang=default</base.url> 

@@ -19,10 +19,12 @@ public class Test_Footer  extends AbstractWebDriverScriptTestCase {
 	private final static Logger logger = Logger.getLogger(Test_Footer.class);
 	
 	private static WebDriver driver;
-    private String baseUrl;
+	private static String baseurl = System.getProperty("base.url");
     private boolean acceptNextAlert = true;
+    
     private StringBuffer verificationErrors = new StringBuffer();
 
+    
     @BeforeClass
     public static void initClass() {
     	
@@ -36,20 +38,19 @@ public class Test_Footer  extends AbstractWebDriverScriptTestCase {
 			}
 		} else {
 	        driver = BrowserDriver.getXLTChromeWebDriver();
-	        if(null == System.getProperty("work.env")){
-	            System.setProperty("work.env", "DEV");
-	            System.setProperty("work.module", "FOOTER");
-	        }else{
-	        	System.setProperty("work.env", "DEV");
-	        }
 		}
-
+    	
+        if(null == System.getProperty("work.env")){
+            System.setProperty("work.env", "DEV");
+            System.setProperty("work.module", "FOOTER");
+			if(null == baseurl)
+				baseurl = BrowserDriver.DEV_URL;
+        }
     }
 
     
 	public Test_Footer() {
 		super(driver);
-		// TODO Auto-generated constructor stub
 	}
 
 
@@ -58,7 +59,7 @@ public class Test_Footer  extends AbstractWebDriverScriptTestCase {
     	
     	try{
     		try{
-    			driver.get(BrowserDriver.BASE_URL);
+    			driver.get(baseurl);
     			pause(5000);
     		}catch(TimeoutException te){
     			verificationErrors.append(te.getMessage());

@@ -59,7 +59,8 @@ public class Test_Header extends AbstractWebDriverScriptTestCase {
 			logger.info("System Property : NULL");
 			driver = BrowserDriver.getXLTChromeWebDriver();
 //			driver = BrowserDriver.getChromeWebDriver();
-			baseurl = BrowserDriver.DEV_URL;
+			if(null == baseurl)
+				baseurl = BrowserDriver.DEV_URL;
 			System.setProperty("work.env", "DEV");
 			System.setProperty("work.module", "HEADER");
 		}
@@ -187,7 +188,6 @@ public class Test_Header extends AbstractWebDriverScriptTestCase {
 		WebElement webElement = driver
 				.findElement(By.xpath("//*[@id=\"ext-gen44\"]/body/header/nav/div[1]/div[1]/a/img"));
 		logger.info("CLASS : " + logoClass + "\nURL : " + logoDetails[1] + "\nTITLE : " + logoDetails[2]);
-		logger.info("ENV " + ENV);
 		if (logoClass.equals(webElement.getAttribute("class"))) {
 			// String anchorURL = webElement.getAttribute("href");
 			String anchorURL = driver.findElement(By.xpath("//*[@id=\"ext-gen44\"]/body/header/nav/div[1]/div[1]/a"))
