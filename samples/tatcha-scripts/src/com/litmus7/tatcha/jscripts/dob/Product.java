@@ -11,7 +11,23 @@ public class Product {
 	private String variant1;
 	private String variant2;
 	private String wasPrice;
-
+	private int quantity;
+	
+	private int size;
+	private String flag1;
+	private String flag2;
+	private int ratings;
+	private int reviews;
+	private String status;
+	private int productNo;
+	
+	
+	public int getProductNo() {
+		return productNo;
+	}
+	public void setProductNo(int productNo) {
+		this.productNo = productNo;
+	}
 	public String getPid() {
 		return pid;
 	}
@@ -67,4 +83,49 @@ public class Product {
 	     this.wasPrice = wasPrice;
 	 }
      
+	    public int getQuantity() {
+	        return quantity;
+	    }
+
+	    public void setQuantity(int quantity) {
+	        this.quantity = quantity;
+	    }
+		public int getSize() {
+			return size;
+		}
+		public void setSize(int size) {
+			this.size = size;
+		}
+		public String getFlag1() {
+			return flag1;
+		}
+		public void setFlag1(String flag1) {
+			this.flag1 = flag1;
+		}
+		public String getFlag2() {
+			return flag2;
+		}
+		public void setFlag2(String flag2) {
+			this.flag2 = flag2;
+		}
+		public int getRatings() {
+			return ratings;
+		}
+		public void setRatings(int ratings) {
+			this.ratings = ratings;
+		}
+		
+		public int getReviews() {
+			return reviews;
+		}
+		public void setReviews(int reviews) {
+			this.reviews = reviews;
+		}
+		public String getStatus() {
+			return status;
+		}
+		public void setStatus(String status) {
+			this.status = status;
+		}
+	    
 }

@@ -44,6 +44,11 @@ public class BrowserDriver extends AbstractScriptTestCase {
 	 public static final String PROD_URL = "http://production-na01-tatcha.demandware.net/s/tatcha/home?lang=default";
 	 public static final String PREV_URL = "https://preview.tatcha.net/home?lang=default";
 	 public static final String BASE_URL = DEV_URL;
+	 
+	 public static final String USERNAME = "storefront";
+	 public static final String PASSWORD = "Tatcha123";
+	 
+	 public static final String DEV_SHOPALL = "http://development-na01-tatcha.demandware.net/s/tatcha/category/shop-all/";
 	
 	public static WebDriver getFireFoxWebDriver(){
         capabilities = DesiredCapabilities.firefox();

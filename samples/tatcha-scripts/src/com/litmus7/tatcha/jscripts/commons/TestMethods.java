@@ -2,10 +2,26 @@ package com.litmus7.tatcha.jscripts.commons;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.openqa.selenium.By;
@@ -16,21 +32,25 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import com.litmus7.tatcha.jscripts.dob.Product;
+import com.litmus7.tatcha.utils.BrowserDriver;
+import com.xceptance.xlt.api.webdriver.XltDriver;
+
 public class TestMethods {
 	private final static Logger logger = Logger.getLogger(TestMethods.class);
 
 	private static TestMethods instance = null;
-	
-	public static final TestMethods getInstance(){
-		if(null == instance)
+
+	public static final TestMethods getInstance() {
+		if (null == instance)
 			instance = new TestMethods();
 		return instance;
 	}
-	
-	private TestMethods(){
-		
+
+	private TestMethods() {
+
 	}
-	
+
 	public void testNewsLetterPopupModal(WebDriver driver2) {
 		// driver2.manage().timeouts().implicitlyWait(3,TimeUnit.SECONDS);
 		// JavascriptExecutor js = (JavascriptExecutor)driver2;
@@ -40,11 +60,12 @@ public class TestMethods {
 		// webDriver).executeScript("return
 		// document.readyState").equals("complete"));
 		// waitForLoad(driver2);
+
 		Properties propNews = new Properties();
 		try {
 			propNews.load(new FileInputStream(getClass().getResource("/news_letter.properties").getFile()));
 		} catch (IOException ie) {
-			logger.error("NEWS LETTER PROPERTIES FILE ERROR: "+ie.toString());
+			logger.error("NEWS LETTER PROPERTIES FILE ERROR: " + ie.toString());
 		}
 
 		waitForPageLoaded(driver2);
@@ -53,7 +74,7 @@ public class TestMethods {
 		WebElement we = getWE(driver2, propNews, "newsletter.popup.close");
 		we.click();
 	}
-	
+
 	public void waitForLoad(WebDriver driver) {
 		ExpectedCondition<Boolean> pageLoadCondition = new ExpectedCondition<Boolean>() {
 			public Boolean apply(WebDriver driver) {
@@ -78,8 +99,7 @@ public class TestMethods {
 		} catch (Throwable error) {
 			Assert.fail("Timeout waiting for Page Load Request to complete.");
 		}
-	}	
-	
+	}
 
 	public WebElement getWE(WebDriver driver, Properties prop, String propKey) {
 		WebElement we = null;
@@ -112,8 +132,8 @@ public class TestMethods {
 			logger.error("ASSERTION-EQUALS ERROR b/w " + PARAM1 + " & " + PARAM2);
 		}
 	}
-	
-	public Properties getEnvPropertyFile(){
+
+	public Properties getEnvPropertyFile() {
 		Properties prop = new Properties();
 		if (null != System.getProperty("work.env")) {
 			String ENV = System.getProperty("work.env").toString();
@@ -127,26 +147,266 @@ public class TestMethods {
 			} else if (ENV.equalsIgnoreCase("DEMO")) {
 
 			} else if (ENV.equalsIgnoreCase("DEV")) {
-				if(MODULE.equalsIgnoreCase("HEADER")){
+				if (MODULE.equalsIgnoreCase("HEADER")) {
 					try {
 						prop.load(new FileInputStream(getClass().getResource("/DEV_Header.properties").getFile()));
 					} catch (IOException ie) {
-						logger.error("PROPERTY FILE MISSING: DEV_HeaderElement"+ie.toString());
+						logger.error("PROPERTY FILE MISSING: DEV_HeaderElement" + ie.toString());
 					}
 				}
-				
-				if(MODULE.equalsIgnoreCase("FOOTER")){
+
+				if (MODULE.equalsIgnoreCase("FOOTER")) {
 					try {
 						prop.load(new FileInputStream(getClass().getResource("/DEV_Footer.properties").getFile()));
 					} catch (IOException ie) {
-						logger.error("PROPERTY FILE MISSING: DEV_HeaderElement"+ie.toString());
+						logger.error("PROPERTY FILE MISSING: DEV_HeaderElement" + ie.toString());
 					}
 				}
-			}else{
+			} else {
 				logger.error("ENVIRONMENT NOT SPECIFIED");
 			}
 		}
 		return prop;
 	}
 
+	public String getBaseURL() {
+		String ENV = System.getProperty("work.env");
+		String MODULE = System.getProperty("work.module");
+		String PRODUCT = System.getProperty("product.name");
+		
+		StringBuilder BASE_URL = new StringBuilder();
+		Properties prop = new Properties();
+		try {
+			prop.load(new FileInputStream(getClass().getResource("/URL_HTTP.properties").getFile()));
+			if (null != ENV && !ENV.isEmpty()) {
+				if (ENV.equalsIgnoreCase("LIVE"))
+					BASE_URL.append(prop.get("url.live").toString());
+				else if (ENV.equalsIgnoreCase("STAGE"))
+					BASE_URL.append(prop.get("url.stage").toString());
+				else if (ENV.equalsIgnoreCase("DEMO"))
+					BASE_URL.append(prop.get("url.demo").toString());
+				else if (ENV.equalsIgnoreCase("DEV_SEC"))
+					BASE_URL.append(prop.get("url.dev.security").toString());
+				else 
+					BASE_URL.append(prop.get("url.dev").toString());
+			} else {
+				BASE_URL.append(prop.get("url.dev").toString());
+			}
+
+			/** EITHER MODULE OR PRODUCT GIVEN */
+			/** MODULES FOR PRODUCT LISTING PAGE */
+			if (null != MODULE && !MODULE.trim().isEmpty()) {
+				if (MODULE.equalsIgnoreCase("SHOPALL"))
+					BASE_URL.append(prop.get("ctg.shopall").toString());
+				else if (MODULE.equalsIgnoreCase("MOIST"))
+					BASE_URL.append(prop.get("ctg.moist").toString());
+				else if (MODULE.equalsIgnoreCase("CLEANS"))
+					BASE_URL.append(prop.get("ctg.cleans").toString());
+				else if (MODULE.equalsIgnoreCase("FACE"))
+					BASE_URL.append(prop.get("ctg.face").toString());
+				else if (MODULE.equalsIgnoreCase("MASKS"))
+					BASE_URL.append(prop.get("ctg.masks").toString());
+				else if (MODULE.equalsIgnoreCase("ESSENCE"))
+					BASE_URL.append(prop.get("ctg.essence").toString());
+				else if (MODULE.equalsIgnoreCase("EYE"))
+					BASE_URL.append(prop.get("ctg.eye").toString());
+				else if (MODULE.equalsIgnoreCase("LIP"))
+					BASE_URL.append(prop.get("ctg.lip").toString());
+				else if (MODULE.equalsIgnoreCase("MAKEUP"))
+					BASE_URL.append(prop.get("ctg.makeup").toString());
+				else if (MODULE.equalsIgnoreCase("PRIMING"))
+					BASE_URL.append(prop.get("ctg.priming").toString());
+				else if (MODULE.equalsIgnoreCase("BODY"))
+					BASE_URL.append(prop.get("ctg.body").toString());
+				else if (MODULE.equalsIgnoreCase("BLOTTING"))
+					BASE_URL.append(prop.get("ctg.blotting").toString());
+				else if (MODULE.equalsIgnoreCase("NORMALDRY"))
+					BASE_URL.append(prop.get("ctg.normaldry").toString());
+				else if (MODULE.equalsIgnoreCase("NORMALOILY"))
+					BASE_URL.append(prop.get("ctg.normaloily").toString());
+				else if (MODULE.equalsIgnoreCase("DRY"))
+					BASE_URL.append(prop.get("ctg.dry").toString());
+				else if (MODULE.equalsIgnoreCase("SENSITIVE"))
+					BASE_URL.append(prop.get("ctg.sensitive").toString());
+				else if (MODULE.equalsIgnoreCase("BESTSELLERS"))
+					BASE_URL.append(prop.get("ctg.bestsellers").toString());
+				else if (MODULE.equalsIgnoreCase("NEW"))
+					BASE_URL.append(prop.get("ctg.new").toString());
+				else if (MODULE.equalsIgnoreCase("GIFTSETS"))
+					BASE_URL.append(prop.get("ctg.giftsets").toString());
+				else if (MODULE.equalsIgnoreCase("GIFTPURCHASE"))
+					BASE_URL.append(prop.get("ctg.giftpurchase").toString());
+				else if (MODULE.equalsIgnoreCase("GIFTPOUCH"))
+					BASE_URL.append(prop.get("ctg.giftpouch").toString());
+				else if (MODULE.equalsIgnoreCase("OURSTORY"))
+					BASE_URL.append(prop.get("ctg.ourstory").toString());
+				else if (MODULE.equalsIgnoreCase("NATURAL"))
+					BASE_URL.append(prop.get("ctg.natural").toString());
+				else if (MODULE.equalsIgnoreCase("TIPS"))
+					BASE_URL.append(prop.get("ctg.tips").toString());
+				else if (MODULE.equalsIgnoreCase("GIVING"))
+					BASE_URL.append(prop.get("ctg.giving").toString());
+				else
+					BASE_URL.append(prop.get("ctg.bestsellers").toString());
+				
+			}else if (null != PRODUCT && !PRODUCT.trim().isEmpty()) {
+				if (PRODUCT.equalsIgnoreCase("WATERCREAM"))
+					BASE_URL.append(prop.get("product.watercream").toString());
+				else if (PRODUCT.equalsIgnoreCase("SILKCANVAS"))
+					BASE_URL.append(prop.get("product.silkcanvas").toString());
+				else if (PRODUCT.equalsIgnoreCase("PCOIL"))
+					BASE_URL.append(prop.get("product.pcoil").toString());
+				else if (PRODUCT.equalsIgnoreCase("PCOIL.TRAVEL"))
+					BASE_URL.append(prop.get("product.pcoil.travel").toString());
+				else if (PRODUCT.equalsIgnoreCase("PCOIL.SUPER"))
+					BASE_URL.append(prop.get("product.pcoil.super").toString());
+				else if (PRODUCT.equalsIgnoreCase("PINKSTARTER.NORMDRY"))
+					BASE_URL.append(prop.get("product.pinkstarter.normdry").toString());
+				else if (PRODUCT.equalsIgnoreCase("REDLIP"))
+					BASE_URL.append(prop.get("product.redlip").toString());
+				else if (PRODUCT.equalsIgnoreCase("DPCLEANSE"))
+					BASE_URL.append(prop.get("product.dpcleanse").toString());
+				else
+					BASE_URL.append(prop.get("product.watercream").toString());
+				
+			} else {
+					BASE_URL.append(prop.get("ctg.home").toString());
+				}
+			
+		} catch (IOException ie) {
+			logger.error("PROPERTY FILE MISSING: URL_HTTP" + ie.toString());
+		}
+		return BASE_URL.toString();
+	}
+	
+	public void basicAuth(String webURL){
+		try {
+//			String webPage = BrowserDriver.DEV_URL;
+			
+			String name = BrowserDriver.USERNAME;
+			String password = BrowserDriver.PASSWORD;
+
+			String authString = name + ":" + password;
+			byte[] authEncBytes = Base64.encodeBase64(authString.getBytes());
+			String authStringEnc = new String(authEncBytes);
+			System.out.println("Base64 encoded auth string: " + authStringEnc);
+
+			URL url = new URL(webURL);
+			URLConnection urlConnection = url.openConnection();
+			urlConnection.setRequestProperty("Authorization", "Basic " + authStringEnc);
+		
+//			return urlConnection.getURL();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+//		return null;
+	}
+	
+	public boolean writeToPropertiesFile(List<Product> prodList){
+		
+		String MODULE = System.getProperty("work.module");
+		if(null != MODULE){
+			MODULE = "SHOP ALL";
+		}
+		
+		Properties prop = new Properties();
+		OutputStream output = null;		
+		try {
+			
+			output = new FileOutputStream("PRODUCT_DETAILS.properties");
+			 
+			/** Sort using java 8 only */
+			Collections.sort(prodList, (o1, o2) -> o1.getProductNo() - o2.getProductNo());
+//			Collections.sort(prodList,new ProductSort());
+
+			for(Product prod : prodList){
+				String PID = prod.getPid();
+				if(null != PID){
+						if(null != prod.getName())
+							prop.setProperty("name."+PID, prod.getName());
+						if(null != prod.getSubtitle())
+							prop.setProperty("subtitle."+PID, prod.getSubtitle());
+						if(null != prod.getPrice())
+							prop.setProperty("price."+PID, prod.getPrice()+"");
+						if(0 != prod.getSize())
+							prop.setProperty("size."+PID, prod.getSize()+"");
+						if(0 != prod.getReviews())
+							prop.setProperty("reviews."+PID, prod.getReviews()+"");
+						if(null != prod.getStatus())
+							prop.setProperty("status."+PID, prod.getStatus());
+						if(null != prod.getFlag1())
+							prop.setProperty("flag1."+PID, prod.getFlag1());
+						if(null != prod.getFlag2())
+							prop.setProperty("flag2."+PID, prod.getFlag2());	
+
+				}
+			}
+			
+			// save properties to project root folder
+			String COMMENTS = "Product Details with total count "+prodList.size();
+			prop.store(output, COMMENTS);
+			
+			
+			return true;
+
+		} catch (IOException io) {
+//			io.printStackTrace();
+			logger.error(MODULE+" WRITE TO PROP FILE EXP:"+io.toString());
+		} finally {
+			if (output != null) {
+				try {
+					output.close();
+				} catch (IOException e) {
+//					e.printStackTrace();
+					logger.error(MODULE+" WRITE TO PROP FILE FINALLY EXP:"+e.toString());
+				}
+			}
+		}		
+
+		return false;
+	  }
+	
+	 public void writeToFile(){
+		 Path path = Paths.get("/Product_Details.txt");		  
+		 try (BufferedWriter writer = Files.newBufferedWriter(path))
+		 {
+		     writer.write("Hello World !!");
+		 } catch (IOException e) {
+//			e.printStackTrace();
+			 logger.error("FILE WRITING EXP:'");
+		}
+	 }
+	 
+	 public static WebDriver getWebDriver(){
+		 WebDriver driver = null;
+			if (null != System.getProperty("test.type")) {
+				/** Load Testing */
+				if (System.getProperty("test.type").equals("load.xlt")) {
+					logger.info("Load Testing : XLT");
+					driver = BrowserDriver.getXLTChromeWebDriver();
+//					driver = new XltDriver();
+				/** Browser Automation */	
+				} else if (System.getProperty("test.type").equals("browser.chrome")) {
+					logger.info("Browser Automation : Google Chrome");
+					driver = BrowserDriver.getChromeWebDriver();
+				}
+			} else {
+				driver = BrowserDriver.getChromeWebDriver();
+				/** Customly needed for JUnit Exec */
+				if (null == System.getProperty("work.env")) {
+					System.setProperty("work.env", "DEV_SEC");
+				}
+				
+		/*		if (null == System.getProperty("work.module")) {
+					System.setProperty("work.module", "BESTSELLERS");
+				}*/
+				
+				if (null == System.getProperty("product.name")) {
+					System.setProperty("product.name", "SILKCANVAS");
+				}
+			}
+			return driver;
+	 }
 }
