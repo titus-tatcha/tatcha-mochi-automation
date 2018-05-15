@@ -1,5 +1,8 @@
-#/target/
+# Add below files / folders to be ignored
 .classpath
 .project
 .settings/
 target/
+results/
+scripts/
+

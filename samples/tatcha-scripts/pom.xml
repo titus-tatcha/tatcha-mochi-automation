@@ -1,13 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	
+
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.litmus7.tatcha</groupId>
 	<artifactId>tatcha-mochi-automation</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>tatcha-mochi-automation</name>
 	<description>Tatcha Mochi Automation Scripts</description>
-	
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -15,80 +15,27 @@
 	<build>
 
 		<resources>
-			<!-- Resource Folder  -->
+			<!-- Resource Folder -->
 			<resource>
-				<directory>src/com/litmus7/tatcha/data</directory>
+				<directory>src/com/tatcha/data</directory>
 				<filtering>true</filtering>
-				
+
 			</resource>
-			
-			<!-- To Write Versions  -->
-			<!-- 
-			<resource>
-		      <directory>src/main/resources</directory>
-		      <filtering>true</filtering>
-		      <includes>
-		        <include>**/version.txt</include>
-		      </includes>
-		    </resource>
-		    <resource>
-		      <directory>src/main/resources</directory>
-		      <filtering>false</filtering>
-		      <excludes>
-		        <exclude>**/version.txt</exclude>
-		      </excludes>
-		    </resource -->
-						
+
+			<!-- To Write Versions -->
+			<!-- <resource> <directory>src/main/resources</directory> <filtering>true</filtering> 
+				<includes> <include>**/version.txt</include> </includes> </resource> <resource> 
+				<directory>src/main/resources</directory> <filtering>false</filtering> <excludes> 
+				<exclude>**/version.txt</exclude> </excludes> </resource -->
+
 		</resources>
 
 		<!-- <sourceDirectory>src</sourceDirectory> -->
 		<testSourceDirectory>src</testSourceDirectory>
-		<plugins>	
-		
+		<plugins>
+
 			<!-- To write Version -->
-			
-		    <!--   
-		      <plugin>
-		        <artifactId>maven-antrun-plugin</artifactId>
-		         <version>1.4</version>
-		         <executions>
-		          <execution>
-		            <phase>process-resources</phase>
-		            <configuration>
-		               <tasks>
-		                 <copy file="${project.build.outputDirectory}/version.txt"
-		                   toFile="..." overwrite="true" />
-		              </tasks>
-		            </configuration>
-		            <goals>
-		              <goal>run</goal>
-		            </goals>
-		          </execution>
-		        </executions>
-		      </plugin> 
-		     -->
-   
-		 <!-- 
-	      <plugin>
-	        <groupId>org.codehaus.mojo</groupId>
-	        <artifactId>properties-maven-plugin</artifactId>
-	        <version>1.0-alpha-2</version>
-	        <executions>
-	          <execution>
-	            <phase>initialize</phase>
-	            <goals>
-	              <goal>read-project-properties</goal>
-	            </goals>
-	            <configuration>
-	              <files>
-	                 <file>${project.build.resources[0].directory}/${myenv}.properties</file>       
-	              </files>
-	            </configuration>
-	          </execution>
-	        </executions>
-	      </plugin>
-		 -->
-		 
+
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.3</version>
@@ -102,139 +49,68 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 
-				<version>2.20</version> 
-				<!-- 
-				<version>2.21.0</version>
-				 -->
-				
+				<version>2.20</version>
+				<!-- <version>2.21.0</version> -->
+
 				<configuration>
 					<argLine>-Xmx1024m -XX:MaxPermSize=256m</argLine>
-										
-					<includes>
-						
-						<!-- Sprint 3 <include>com/litmus7/tatcha/jscripts/selenium/myaccount/MyAccount_MOC_16.java</include> 
-							<include>com/litmus7/tatcha/jscripts/selenium/myaccount/AddressBook.java</include> 
-							<include>com/litmus7/tatcha/jscripts/selenium/myaccount/PaymentOptions.java</include> 
-							<include>com/litmus7/tatcha/jscripts/selenium/login/MyLogin.java</include> 
-							<include>com/litmus7/tatcha/jscripts/selenium/login/MyLoginWithFB.java</include> 
-							<include>com/litmus7/tatcha/jscripts/selenium/login/Register.java</include> 
-							<include>com/litmus7/tatcha/jscripts/selenium/login/RegisterWithFB.java</include> 
-							
-							
-							<include>com/litmus7/tatcha/jscripts/selenium/navigation/GlobalNavigation_FooterLinks_MOC_39.java</include> -->
 
-						<!-- Sprint 3 -->
-						<!-- 	 
-						<include>com/litmus7/tatcha/jscripts/selenium/sprint3/Login.java</include>	
-																		
-						<include>com/litmus7/tatcha/jscripts/selenium/login/MyLogin.java</include> 
-						<include>com/litmus7/tatcha/jscripts/selenium/login/MyLoginWithFB.java</include> 
-						<include>com/litmus7/tatcha/jscripts/selenium/login/Register.java</include> 
-						<include>com/litmus7/tatcha/jscripts/selenium/login/RegisterWithFB.java</include> 			
-						
-						<include>com/litmus7/tatcha/jscripts/selenium/navigation/Test_Header.java</include> 
-						<include>com/litmus7/tatcha/jscripts/selenium/navigation/Test_Footer.java</include> 
-						-->	
-						<!-- Sprint 4 -->	
-						 <!--
-						<include>com/litmus7/tatcha/jscripts/selenium/sprint4/AddToCartGuestUser.java</include> --><!--  shopping bag  -->
-						 
-						<!-- Sprint 5 -->
-						<!--
-						<include>com/litmus7/tatcha/jscripts/selenium/sprint5/AddToCartGuest.java</include> 
-						-->
-						<include>com/litmus7/tatcha/jscripts/selenium/sprint5/PLP.java</include> 
-						
-						<!-- Sprint 6 -->
-						 <!--	<include>com/litmus7/tatcha/jscripts/selenium/sprint6/AddItemToCart.java</include>    -->
-						
-						<!-- AddToCartLoginCheckout  -->
-						<!-- AddToCartGuestCheckout  -->
+					<includes>
+						<!-- <include>com/tatcha/jscripts/navigation/TestHeader.java</include> 
+							<include>com/tatcha/jscripts/navigation/TestFooter.java</include> <include>com/tatcha/jscripts/product/TestPDP.java</include> 
+							<include>com/tatcha/jscripts/product/TestPLP.java</include> <include>com/tatcha/jscripts/testflows/BagUpdateQuantityEditReview.java</include> 
+							<include>com/tatcha/jscripts/testflows/EditReviewUSAddress.java</include> 
+							<include>com/tatcha/jscripts/testflows/GiftCertificateCheckout.java</include> 
+							<include>com/tatcha/jscripts/testflows/GuestCheckoutInternationalAddress.java</include> 
+							<include>com/tatcha/jscripts/testflows/GuestCheckoutInternationalAddressRegister.java</include> 
+							<include>com/tatcha/jscripts/testflows/GuestCheckoutUSAddress.java</include> 
+							<include>com/tatcha/jscripts/testflows/GuestCheckoutUSAddressRegister.java</include> 
+							<include>com/tatcha/jscripts/testflows/LoginCheckoutFirstAddressInternational.java</include> 
+							<include>com/tatcha/jscripts/testflows/LoginCheckoutFirstAddressUS.java</include> 
+							<include>com/tatcha/jscripts/testflows/LoginCheckoutNewAddressInternational.java</include> 
+							<include>com/tatcha/jscripts/testflows/LoginCheckoutNewAddressUS.java</include> 
+							<include>com/tatcha/jscripts/testflows/LoginCheckoutSelectAddressInternational.java</include> 
+							<include>com/tatcha/jscripts/testflows/LoginCheckoutSelectAddressUS.java</include> 
+							<include>com/tatcha/jscripts/testflows/LoginExpressCheckoutDefaultInternational.java</include> 
+							<include>com/tatcha/jscripts/testflows/LoginExpressCheckoutDefaultUS.java</include> -->
 							
-						<!-- Sprint 7 -->
-						<!-- ProductLisingPage  -->
-						
-						<!-- XLT Load Test Scripts -->
-						<!-- com.litmus7.tatcha.jscripts.xlt.Sprint3Register.java -->
-						<!--
-						<include>com/litmus7/tatcha/jscripts/xlt/fullflow/GuestFlow.java</include> 
-						-->
-						
-						<!--
-						Login Sprint3
-						AddToCartLoginCheckout Sprint6
-						AddToCartGuestCheckout Sprint6
-						
-						-->	
+							<include>com/tatcha/jscripts/product/TestPDP.java</include>
+						<!--  
+						<include>com/tatcha/jscripts/product/TestPDP.java</include>
+						<include>com/tatcha/jscripts/product/TestPLP.java</include>
+						<include>com/tatcha/jscripts/navigation/*.java</include>
+						<include>com/tatcha/jscripts/testflows/*.java</include>
+ 						-->
+
 					</includes>
 					<systemPropertyVariables>
 						<!-- Relocate the XLT results directory under target. -->
 						<com.xceptance.xlt.result-dir>${project.build.directory}/xlt-results</com.xceptance.xlt.result-dir>
-						
-			            <!--  <test.type>load.xlt</test.type>      -->
-			             <test.type>browser.chrome</test.type>  
-			             
-			             <work.env>DEV_SEC</work.env>	
-			             
-			             <work.module>BESTSELLERS</work.module>    
-								<!-- 	SHOPALL
-										MOIST
-										CLEANS
-										FACE
-										MASKS
-										ESSENCE
-										EYE
-										LIP
-										MAKEUP
-										PRIMING
-										BODY
-										BLOTTING
-										NORMALDRY
-										NORMALOILY
-										DRY
-										SENSITIVE
-										BESTSELLERS
-										NEW
-										GIFTSETS
-										GIFTPURCHASE
-										GIFTPOUCH
-										OURSTORY
-										NATURAL
-										TIPS
-										GIVING -->
-									
-			             <product.name>WATERCREAM</product.name>
-							<!-- 	 SILKCANVAS
-						             PCOIL
-									 PCOIL.TRAVEL
-									 PINKSTARTER.NORMDRY
-									 REDLIP
-									 DPCLEANSE 
-									 WATERCREAM
-							-->
-							
-			             <!--    
-			             <work.env>staging</work.env>	
-						 <base.url>http://staging-na01-tatcha.demandware.net/s/tatcha/home?lang=default</base.url> 
-						 
-						 <work.env>demo</work.env>
-						 <base.url>http://demo-na01-tatcha.demandware.net/on/demandware.store/Sites-tatcha-Site</base.url> 
-						 
-						 <work.env>prod</work.env>	         
-					     <base.url>http://production-na01-tatcha.demandware.net/s/tatcha/home?lang=default</base.url>
-					     			             
-					     <work.env>prev</work.env>	  	
-						 <base.url>https://preview.tatcha.net/</base.url>
-						 
-						 <work.env>live</work.env>	  	
-						 <base.url>http://www.tatcha.com/</base.url>
-			             -->
+
+						<!-- <test.type>load.xlt</test.type> -->
+						<test.type>browser.chrome</test.type>
+						<work.env>DEV_SEC</work.env>
+						<!--  <work.module>SHOPALL</work.module> -->
+						 <product.name>REDLIP</product.name> 
+
+						<!--Modules: SHOPALL MOIST CLEANS FACE MASKS ESSENCE EYE LIP MAKEUP 
+							PRIMING BODY BLOTTING NORMALDRY NORMALOILY DRY SENSITIVE BESTSELLERS NEW 
+							GIFTSETS GIFTPURCHASE GIFTPOUCH OURSTORY NATURAL TIPS GIVING HEADER FOOTER -->
+
+						<!-- Products: SILKCANVAS PCOIL PCOIL.TRAVEL PINKSTARTER.NORMDRY REDLIP 
+							DPCLEANSE WATERCREAM -->
+
+						<!-- <work.env>staging</work.env> <base.url>http://staging-na01-tatcha.demandware.net/s/tatcha/home?lang=default</base.url> 
+							<work.env>demo</work.env> <base.url>http://demo-na01-tatcha.demandware.net/on/demandware.store/Sites-tatcha-Site</base.url> 
+							<work.env>prod</work.env> <base.url>http://production-na01-tatcha.demandware.net/s/tatcha/home?lang=default</base.url> 
+							<work.env>prev</work.env> <base.url>https://preview.tatcha.net/</base.url> 
+							<work.env>live</work.env> <base.url>http://www.tatcha.com/</base.url> -->
 					</systemPropertyVariables>
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
-  
+
 	<repositories>
 		<!-- Declare Xceptance repository that hosts the XLT artifacts -->
 		<repository>
@@ -255,7 +131,7 @@
 			<artifactId>commons-lang</artifactId>
 			<version>2.6</version>
 		</dependency>
-		
+
 		<!-- Declare Saucelabs dependency -->
 		<dependency>
 			<groupId>com.saucelabs</groupId>
@@ -269,17 +145,32 @@
 			<artifactId>log4j</artifactId>
 			<version>1.2.17</version>
 		</dependency>
+
+		<!-- Velocity -->
+		<dependency>
+			<groupId>org.apache.velocity</groupId>
+			<artifactId>velocity</artifactId>
+			<version>1.7</version>
+		</dependency>
+
+		<!-- Mailing -->
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>1.4</version>
+		</dependency>
+
 	</dependencies>
-	
-		<!-- For generating Test Report -->
+
+	<!-- For generating Test Report -->
 	<reporting>
-	    <plugins>
-	      <plugin>
-	        <groupId>org.apache.maven.plugins</groupId>
-	        <artifactId>maven-surefire-report-plugin</artifactId>
-	        <version>2.20.1</version>
-	      </plugin>
-	    </plugins>
-  	</reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-report-plugin</artifactId>
+				<version>2.20.1</version>
+			</plugin>
+		</plugins>
+	</reporting>
 
 </project>

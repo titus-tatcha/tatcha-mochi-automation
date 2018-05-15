@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Tatcha Test Report</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <!-- from pjt resource -->
+  <link rel="stylesheet" href="file:///D:\project\AutomatedTestingDW\Report\bootstrap.min.css">
+  <script src="file:///D:\project\AutomatedTestingDW\Report\jquery.min.js"></script>
+  <script src="file:///D:\project\AutomatedTestingDW\Report\bootstrap.min.js"></script>
+  
+  
+</head>
+<body>
+
+<div class="container">
+  <h2>Test Report for &lt; $module &gt; </h2>
+  <p> Following are the findings :- </p>    
+  <p> $content </p>         
+  <table class="table">
+    <thead>
+	  <tr>
+	    <th>TC No:</th>
+	    <th>MOC</th> 
+	    <th>Functionality</th> 
+	    <th>Pass / Fail</th>
+		<th>Remarks</th>
+	  </tr>
+    </thead>
+    
+	 <tbody>
+	  <tr>
+	    <td>TC 01</td>
+	    <td>MOC 31</td> 
+	    <td style="color:green">Pass</td>
+	  </tr>
+	
+
+	  
+	  <tr>
+	    <td>TC 02</td>
+	    <td>MOC 31</td> 
+	    <td style="color:red">Fail</td>
+		<td style="color:red">Assertion Error: Missing Product Price</td>
+	  </tr> 
+	  
+		#foreach ($number in [101..103])
+		    <tr><td>$number</td></tr>
+		#end
+	
+	 </tbody>
+  </table>
+
+</div>
+
+</body>
+</html>
