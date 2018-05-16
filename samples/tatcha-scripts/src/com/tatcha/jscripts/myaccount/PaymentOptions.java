@@ -11,7 +11,6 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.Select;
 
-import com.litmus7.tatcha.jscripts.selenium.myaccount.MyAccount_MOC_16;
 import com.tatcha.utils.BrowserDriver;
 
 public class PaymentOptions {

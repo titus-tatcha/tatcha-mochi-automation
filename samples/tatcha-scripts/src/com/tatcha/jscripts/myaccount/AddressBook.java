@@ -19,7 +19,7 @@ import com.tatcha.jscripts.helper.TatchaTestHelper;
 
 /**
  * 
- * @author Litmus7
+ * @author reshma
  * 
  * Class that contains method to verify the 
  * Address Book activities of My Account
