@@ -27,12 +27,13 @@ import com.tatcha.jscripts.commons.ReportGenerator;
 import com.tatcha.jscripts.commons.TestMethods;
 import com.tatcha.jscripts.dao.Product;
 import com.tatcha.jscripts.dao.TestCase;
+import com.tatcha.jscripts.exception.TatchaException;
 import com.tatcha.utils.ClassUtils;
 import com.xceptance.xlt.api.engine.scripting.AbstractWebDriverScriptTestCase;
 
 /**
- * Test Product Details Page as PRODUCT which is set as system
- * properties in pom.xml. ie. <product.name>
+ * Test Product Details Page as PRODUCT which is set as system properties in
+ * pom.xml. ie. <product.name>
  * 
  * <!--Modules need to be set either one of the following : SHOPALL MOIST CLEANS
  * FACE MASKS ESSENCE EYE LIP MAKEUP PRIMING BODY BLOTTING NORMALDRY NORMALOILY
@@ -84,7 +85,7 @@ public class TestPDP extends AbstractWebDriverScriptTestCase {
 	 */
 
 	@Test
-	public void testPDP() {
+	public void testPDP() throws TatchaException {
 
 		tcList = new ArrayList<TestCase>();
 		try {
@@ -123,7 +124,7 @@ public class TestPDP extends AbstractWebDriverScriptTestCase {
 
 			// Need to check all PDP sections
 
-//			testMarketingFlags(driver, locator);
+			// testMarketingFlags(driver, locator);
 			testProductTitles(driver, product);
 			testProductPrice(driver, product, locator);
 
@@ -151,50 +152,15 @@ public class TestPDP extends AbstractWebDriverScriptTestCase {
 			// checkoutLogin(driver, product);
 
 			// Report Generation for PDP Module
-		} catch (FileNotFoundException e) {
-			String FUNCTIONALITY_ERROR = "Testing PDP";
-			String TC_NO = "TC-ERR";
-			String MOC_NO = "MOC-PDP";
-			String REMARKS = "File Not Found";
-			TestCase tc = new TestCase(TC_NO, MOC_NO, FUNCTIONALITY_ERROR, TcConstants.FAIL, REMARKS);
-			tcList.add(tc);
-		} catch (IOException e) {
-			String FUNCTIONALITY_ERROR = "Testing PDP";
-			String TC_NO = "TC-ERR";
-			String MOC_NO = "MOC-PDP";
-			String REMARKS = "IO Exception";
-			TestCase tc = new TestCase(TC_NO, MOC_NO, FUNCTIONALITY_ERROR, TcConstants.FAIL, REMARKS);
-			tcList.add(tc);
-		}catch (NoSuchElementException e) {
-			String FUNCTIONALITY_ERROR = "Testing PDP";
-			String TC_NO = "TC-ERR";
-			String MOC_NO = "MOC-PDP";
-			String REMARKS = "Element Location Not Found";
-			TestCase tc = new TestCase(TC_NO, MOC_NO, FUNCTIONALITY_ERROR, TcConstants.FAIL, REMARKS);
-			tcList.add(tc);
-		} catch (IllegalArgumentException e) {
-			String FUNCTIONALITY_ERROR = "Testing PDP";
-			String TC_NO = "TC-ERR";
-			String MOC_NO = "MOC-PDP";
-			String REMARKS = "Illegal Argument - Needs a Product to test";
-			TestCase tc = new TestCase(TC_NO, MOC_NO, FUNCTIONALITY_ERROR, TcConstants.FAIL, REMARKS);
-			tcList.add(tc);
-		} catch (TimeoutException e) {
-			String FUNCTIONALITY_ERROR = "Testing PDP";
-			String TC_NO = "TC-ERR";
-			String MOC_NO = "MOC-PDP";
-			String REMARKS = "Time out Exception";
-			TestCase tc = new TestCase(TC_NO, MOC_NO, FUNCTIONALITY_ERROR, TcConstants.FAIL, REMARKS);
-			tcList.add(tc);
-		} /*
-			 * catch (Exception e) { String FUNCTIONALITY_ERROR = "Testing PDP";
-			 * String TC_NO = "TC-ERR"; String MOC_NO = "MOC-PDP"; String
-			 * REMARKS = "Exception"; TestCase tc = new TestCase(TC_NO, MOC_NO,
-			 * FUNCTIONALITY_ERROR, TcConstants.FAIL, REMARKS); tcList.add(tc);
-			 * }
-			 */
+		} catch (Exception exp) {
+			try {
+				throw new TatchaException(exp, tcList);
+			} catch (Exception e) {
+				logger.error("Handling Tatcha Exception " + e.toString());
+			}
+		}
+		// Report Generation for PDP Module
 		ReportGenerator.getInstance().generateReport(MODULE, tcList);
-
 	}
 
 	/**

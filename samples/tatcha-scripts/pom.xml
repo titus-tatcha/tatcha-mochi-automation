@@ -56,32 +56,35 @@
 					<argLine>-Xmx1024m -XX:MaxPermSize=256m</argLine>
 
 					<includes>
-						<!-- <include>com/tatcha/jscripts/navigation/TestHeader.java</include> 
-							<include>com/tatcha/jscripts/navigation/TestFooter.java</include> <include>com/tatcha/jscripts/product/TestPDP.java</include> 
-							<include>com/tatcha/jscripts/product/TestPLP.java</include> <include>com/tatcha/jscripts/testflows/BagUpdateQuantityEditReview.java</include> 
-							<include>com/tatcha/jscripts/testflows/EditReviewUSAddress.java</include> 
-							<include>com/tatcha/jscripts/testflows/GiftCertificateCheckout.java</include> 
-							<include>com/tatcha/jscripts/testflows/GuestCheckoutInternationalAddress.java</include> 
-							<include>com/tatcha/jscripts/testflows/GuestCheckoutInternationalAddressRegister.java</include> 
-							<include>com/tatcha/jscripts/testflows/GuestCheckoutUSAddress.java</include> 
-							<include>com/tatcha/jscripts/testflows/GuestCheckoutUSAddressRegister.java</include> 
-							<include>com/tatcha/jscripts/testflows/LoginCheckoutFirstAddressInternational.java</include> 
-							<include>com/tatcha/jscripts/testflows/LoginCheckoutFirstAddressUS.java</include> 
-							<include>com/tatcha/jscripts/testflows/LoginCheckoutNewAddressInternational.java</include> 
-							<include>com/tatcha/jscripts/testflows/LoginCheckoutNewAddressUS.java</include> 
-							<include>com/tatcha/jscripts/testflows/LoginCheckoutSelectAddressInternational.java</include> 
-							<include>com/tatcha/jscripts/testflows/LoginCheckoutSelectAddressUS.java</include> 
-							<include>com/tatcha/jscripts/testflows/LoginExpressCheckoutDefaultInternational.java</include> 
-							<include>com/tatcha/jscripts/testflows/LoginExpressCheckoutDefaultUS.java</include> -->
-							
-							<include>com/tatcha/jscripts/product/TestPDP.java</include>
-						<!--  
+
+						<include>com/tatcha/jscripts/testflows/LoginExpressCheckoutDefaultUS.java</include>
+				<!-- 
+						<include>com/tatcha/jscripts/testflows/BagUpdateQuantityEditReview.java</include>
+						<include>com/tatcha/jscripts/testflows/EditReviewUSAddress.java</include>
+						<include>com/tatcha/jscripts/testflows/GiftCertificateCheckout.java</include>
+						<include>com/tatcha/jscripts/testflows/GuestCheckoutInternationalAddress.java</include>
+						<include>com/tatcha/jscripts/testflows/GuestCheckoutInternationalAddressRegister.java</include>
+						<include>com/tatcha/jscripts/testflows/GuestCheckoutUSAddress.java</include>
+						<include>com/tatcha/jscripts/testflows/GuestCheckoutUSAddressRegister.java</include>
+
+						<include>com/tatcha/jscripts/testflows/LoginCheckoutFirstAddressInternational.java</include>
+						<include>com/tatcha/jscripts/testflows/LoginCheckoutFirstAddressUS.java</include>
+						<include>com/tatcha/jscripts/testflows/LoginCheckoutNewAddressInternational.java</include>
+						<include>com/tatcha/jscripts/testflows/LoginCheckoutNewAddressUS.java</include>
+						<include>com/tatcha/jscripts/testflows/LoginCheckoutSelectAddressInternational.java</include>
+						<include>com/tatcha/jscripts/testflows/LoginCheckoutSelectAddressUS.java</include>
+						<include>com/tatcha/jscripts/testflows/LoginExpressCheckoutDefaultInternational.java</include>
+						<include>com/tatcha/jscripts/testflows/LoginExpressCheckoutDefaultUS.java</include>
+
+						<include>com/tatcha/jscripts/testflows/*.java</include>
+
 						<include>com/tatcha/jscripts/product/TestPDP.java</include>
 						<include>com/tatcha/jscripts/product/TestPLP.java</include>
-						<include>com/tatcha/jscripts/navigation/*.java</include>
-						<include>com/tatcha/jscripts/testflows/*.java</include>
- 						-->
 
+						<include>com/tatcha/jscripts/navigation/*.java</include>
+						<include>com/tatcha/jscripts/navigation/TestHeader.java</include>
+						<include>com/tatcha/jscripts/navigation/TestFooter.java</include>
+ 				-->
 					</includes>
 					<systemPropertyVariables>
 						<!-- Relocate the XLT results directory under target. -->
@@ -90,8 +93,8 @@
 						<!-- <test.type>load.xlt</test.type> -->
 						<test.type>browser.chrome</test.type>
 						<work.env>DEV_SEC</work.env>
-						<!--  <work.module>SHOPALL</work.module> -->
-						 <product.name>REDLIP</product.name> 
+						<!--<work.module>SHOPALL</work.module> -->
+						<product.name>REDLIP</product.name>
 
 						<!--Modules: SHOPALL MOIST CLEANS FACE MASKS ESSENCE EYE LIP MAKEUP 
 							PRIMING BODY BLOTTING NORMALDRY NORMALOILY DRY SENSITIVE BESTSELLERS NEW 

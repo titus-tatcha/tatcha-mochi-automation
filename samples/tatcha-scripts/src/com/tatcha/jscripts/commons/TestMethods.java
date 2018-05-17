@@ -454,9 +454,9 @@ public class TestMethods {
 				System.setProperty("work.env", "DEV_SEC");
 			}
 
-			// if (null == System.getProperty("work.module")) {
-			// System.setProperty("work.module", "FOOTER");
-			// }
+			 if (null == System.getProperty("work.module")) {
+			 System.setProperty("work.module", "SHOPALL");
+			 }
 
 //			if (null == System.getProperty("product.name")) {
 //				System.setProperty("product.name", "SILKCANVAS");

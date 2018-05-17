@@ -8,12 +8,16 @@ public final class TcConstants {
 	public static String PASS = "PASS";
 	public static String FAIL = "FAIL";
 
+	// Error fields 
+	public static String TC_ERR = "TC-ERR";
+	public static String MOC_ERR = "MOC-ERR";
+	public static String FUN_ERR = "Overall Testing";
+	
 	// Shipping Address Test Case Constants
 	public static String SH_TC_101 = "TC-001";
-	
-	
-	// Product Details Page Test Case Constants
 
+	// Product Details Page Test Case Constants
+	
 	public static String PDP_TC_101 = "TC-101";
 	public static String PDP_MOC_101 = "MOC-23";
 	public static String PDP_FUN_101 = "Marketing Flags";

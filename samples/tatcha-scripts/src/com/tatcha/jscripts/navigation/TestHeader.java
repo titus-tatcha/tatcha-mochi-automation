@@ -23,9 +23,8 @@ import org.openqa.selenium.interactions.Actions;
 import com.tatcha.jscripts.commons.ReportGenerator;
 import com.tatcha.jscripts.commons.TestMethods;
 import com.tatcha.jscripts.dao.TestCase;
-import com.tatcha.jscripts.product.TestPDP;
+import com.tatcha.jscripts.exception.TatchaException;
 import com.xceptance.xlt.api.engine.scripting.AbstractWebDriverScriptTestCase;
-
 
 /**
  * 
@@ -78,24 +77,31 @@ public class TestHeader extends AbstractWebDriverScriptTestCase {
 	public void testHeader() throws Exception {
 
 		tcList = new ArrayList<TestCase>();
-		baseUrl = tmethods.getBaseURL();
-		driver.get(baseUrl);
-		driver.manage().window().maximize();
+		try {
+			baseUrl = tmethods.getBaseURL();
+			driver.get(baseUrl);
+			driver.manage().window().maximize();
 
-		/** Closing News Letter Popup */
-		tmethods.testNewsLetterPopupModal(driver);
+			/** Closing News Letter Popup */
+			tmethods.testNewsLetterPopupModal(driver);
 
-		Properties prop = new Properties();
-		prop = tmethods.getInstance().getEnvPropertyFile();
+			Properties prop = new Properties();
+			prop = tmethods.getInstance().getEnvPropertyFile();
 
-		testPromoBanner(driver, prop);
-		testLogo(driver, prop);
-		int totalNoOfCategories = 5;
-		for (int MENUNUM = 1; MENUNUM <= totalNoOfCategories; MENUNUM++) {
-			String[] categories = prop.get("header.links." + MENUNUM).toString().split("#");
-			callHeaderMenus(driver, categories, MENUNUM);
+			testPromoBanner(driver, prop);
+			testLogo(driver, prop);
+			int totalNoOfCategories = 5;
+			for (int MENUNUM = 1; MENUNUM <= totalNoOfCategories; MENUNUM++) {
+				String[] categories = prop.get("header.links." + MENUNUM).toString().split("#");
+				callHeaderMenus(driver, categories, MENUNUM);
+			}
+		} catch (Exception exp) {
+			try {
+				throw new TatchaException(exp, tcList);
+			} catch (Exception e) {
+				logger.error("Handling Tatcha Exception " + e.toString());
+			}
 		}
-
 		// Report Generation for PDP Module
 		ReportGenerator.getInstance().generateReport(MODULE, tcList);
 

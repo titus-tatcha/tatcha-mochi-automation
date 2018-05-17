@@ -2,10 +2,16 @@ package com.tatcha.utils;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import javax.naming.spi.DirStateFactory.Result;
 
+import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.ElementNotVisibleException;
 import org.openqa.selenium.NoSuchElementException;
@@ -17,6 +23,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.safari.SafariOptions;
 
+import com.tatcha.jscripts.testflows.GuestCheckoutInternationalAddressRegister;
 import com.xceptance.xlt.api.engine.scripting.AbstractScriptTestCase;
 import com.xceptance.xlt.api.engine.scripting.ScriptName;
 import com.xceptance.xlt.api.webdriver.XltChromeDriver;
@@ -36,15 +43,10 @@ public class BrowserDriver extends AbstractScriptTestCase {
 	private String pathToBrowser = null;
 	private String pathToDriverServer = null;
 
-	// public static final String BASE_URL =
-	// "https://52.43.54.174/mocha/tatcha-bootstrap3/src/prototype-wrapper.html";
-	// public static final String PROTOTYPE_URL =
-	// "http://52.43.54.174/mocha/tatcha-bootstrap3/src/prototype-wrapper.html";
 	public static final String BASE_URL_OLD = "http://development-na01-tatcha.demandware.net/on/demandware.store/Sites-tatcha-Site";
 	public static final String DEMO_URL = "http://demo-na01-tatcha.demandware.net/on/demandware.store/Sites-tatcha-Site";
 	public static final String DEV_URL = "http://development-na01-tatcha.demandware.net/s/tatcha/home?lang=default";
-	// public static final String DEV_URL
-	// ="http://storefront:Tatcha123@development-na01-tatcha.demandware.net/s/tatcha/home?lang=default";
+	public static final String DEV_SEC_URL = "http://storefront:Tatcha123@development-na01-tatcha.demandware.net/s/tatcha/home?lang=default";
 
 	public static final String STAGE_URL = "http://staging-na01-tatcha.demandware.net/s/tatcha/home?lang=default";
 	public static final String PROD_URL = "http://production-na01-tatcha.demandware.net/s/tatcha/home?lang=default";
@@ -55,6 +57,10 @@ public class BrowserDriver extends AbstractScriptTestCase {
 	public static final String PASSWORD = "Tatcha123";
 
 	public static final String DEV_SHOPALL = "http://development-na01-tatcha.demandware.net/s/tatcha/category/shop-all/";
+
+	private static Properties driverProperties = new Properties();
+
+	private final static Logger logger = Logger.getLogger(BrowserDriver.class);
 
 	public static WebDriver getFireFoxWebDriver() {
 		capabilities = DesiredCapabilities.firefox();
@@ -67,22 +73,30 @@ public class BrowserDriver extends AbstractScriptTestCase {
 	}
 
 	public static WebDriver getChromeWebDriver() {
-		capabilities = DesiredCapabilities.chrome();
-		// capabilities.setCapability("webdriver.chrome.bin", path);
-		// pathToBrowser = getProperty("xlt.webDriver.chrome.pathToBrowser");
-		// pathToDriverServer =
-		// getProperty("xlt.webDriver.chrome.pathToDriverServer");
-		// System.setProperty("webdriver.chrome.bin",
-		// "xlt.webDriver.chrome.pathToBrowser");
-		// System.setProperty("webdriver.chrome.driver",
-		// "xlt.webDriver.chrome.pathToDriverServer");
+		String METHOD_NAME = "BrowserDriver.getChromeWebDriver:";
+		logger.info("inside " + METHOD_NAME);
+		try {
+			InputStream inputStream = ClassLoader.getSystemResourceAsStream("WEBDRIVER.properties");
+			driverProperties.load(inputStream);	
+		} catch (FileNotFoundException e) {
+			logger.error(METHOD_NAME + e.toString());
+		} catch (IOException e) {
+			logger.error(METHOD_NAME + e.toString());
+		}
 
-		System.setProperty("webdriver.chrome.bin", "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe");
-		System.setProperty("webdriver.chrome.driver",
-				"D:/project/SeleniumTestScripts/chromedriver_win32/chromedriver.exe");
+		capabilities = DesiredCapabilities.chrome();
+
+		// System.setProperty("webdriver.chrome.bin", "C:/Program Files
+		// (x86)/Google/Chrome/Application/chrome.exe");
+		// System.setProperty("webdriver.chrome.driver",
+		// "D:/project/SeleniumTestScripts/chromedriver_win32/chromedriver.exe");
+
+		System.setProperty("webdriver.chrome.bin", driverProperties.getProperty("browser.path"));
+		System.setProperty("webdriver.chrome.driver", driverProperties.getProperty("driver.path"));
 
 		driver = new ChromeDriver(capabilities);
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+		driver.manage().window().maximize();
 		return driver;
 	}
 
@@ -98,12 +112,6 @@ public class BrowserDriver extends AbstractScriptTestCase {
 	}
 
 	public WebDriver getSafariWebDriver() {
-		// System.setProperty("webdriver.safari.bin",
-		// "D:/programs/Safari/Safari.exe");
-		// capabilities = DesiredCapabilities.safari();
-		// capabilities.setCapability(CapabilityType.UNEXPECTED_ALERT_BEHAVIOUR,
-		// UnexpectedAlertBehaviour.IGNORE);
-		// driver = new SafariDriver(capabilities);
 		System.setProperty("webdriver.safari.noinstall", "true");
 		driver = new SafariDriver();
 		return driver;
@@ -113,12 +121,6 @@ public class BrowserDriver extends AbstractScriptTestCase {
 		SafariOptions options = new SafariOptions();
 		options.setUseCleanSession(true);
 		driver = new SafariDriver(options);
-		// capabilities = DesiredCapabilities.safari();
-		// capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
-		// capabilities.setCapability(CapabilityType.UNEXPECTED_ALERT_BEHAVIOUR,
-		// "dismiss");
-		// capabilities.setCapability(SafariOptions.CAPABILITY, options);
-		// driver = new SafariDriver(capabilities);
 		driver.manage().deleteAllCookies();
 		return driver;
 	}

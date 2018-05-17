@@ -34,14 +34,15 @@ import com.tatcha.jscripts.bag.TestAddToCart;
 import com.tatcha.jscripts.commons.*;
 import com.tatcha.jscripts.dao.TestCase;
 import com.tatcha.jscripts.dao.User;
+import com.tatcha.jscripts.exception.TatchaException;
 import com.tatcha.jscripts.helper.TatchaTestHelper;
 import com.tatcha.jscripts.login.TestLogin;
 import com.tatcha.jscripts.review.ReviewOrder;
 import com.tatcha.utils.BrowserDriver;
 
 /**
- * Flow : Add to cart - Login in Checkout page - Order Review(With US address) -
- * Place order
+ * Flow-1 : Add to cart - Login in Checkout page - Order Review(With US address)
+ * - Place order
  * 
  * @author reshma
  *
@@ -68,19 +69,15 @@ public class LoginExpressCheckoutDefaultUS {
 		prop.load(new FileInputStream(getClass().getResource("/tatcha.properties").getFile()));
 		locator.load(new FileInputStream(getClass().getResource("/checkoutElementLocator.properties").getFile()));
 		data.load(new FileInputStream(getClass().getResource("/LoginExpressCheckoutDefaultUS.properties").getFile()));
-		driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 
 		boolean testInLocal = Boolean.parseBoolean(prop.getProperty("testInLocal").toString());
 		if (testInLocal) {
 			String url = data.getProperty("url").toString();
 			driver.get(url);
-			getTestHelper().basicAuth(url);
-			driver.manage().window().maximize();
 		} else {
 			tmethods = TestMethods.getInstance();
 			String baseUrl = tmethods.getBaseURL();
 			driver.get(baseUrl);
-			driver.manage().window().maximize();
 		}
 	}
 
@@ -92,9 +89,10 @@ public class LoginExpressCheckoutDefaultUS {
 	 * @throws Exception
 	 */
 	@Test
-	public void testExpressCheckoutLoginUS() throws Exception {
+	public void testExpressCheckoutLoginUS() throws TatchaException {
 
-//		String FUNCTIONALITY = "Express checkout with default US address and credit card";
+		// String FUNCTIONALITY = "Express checkout with default US address and
+		// credit card";
 		// testCase = new TestCase("Flow-1", "MOC-NIL", FUNCTIONALITY, "FAIL",
 		// "");
 
@@ -147,19 +145,21 @@ public class LoginExpressCheckoutDefaultUS {
 
 			// testCase.setStatus("PASS");
 			// tcList.add(testCase);
-			logger.info("END testExpressCheckoutLoginUS");
-			ReportGenerator.getInstance().generateReport(MODULE, tcList);
-		} catch (NoSuchElementException ne) {
-			logger.error(getClass().getSimpleName() + " : ELEMENT NOT FOUND " + ne.toString());
-		} catch (ElementNotVisibleException nv) {
-			logger.error(getClass().getSimpleName() + " : ELEMENT NOT VISIBLE " + nv.toString());
-		} catch (TimeoutException te) {
-			logger.error(getClass().getSimpleName() + " : TIMEOUT " + te.toString());
-		} catch (StaleElementReferenceException sr) {
-			logger.error(getClass().getSimpleName() + " : STALE ELE REF " + sr.toString());
-		} catch (WebDriverException we) {
-			logger.error(getClass().getSimpleName() + " : WEBDRIVER ISSUE " + we.toString());
+
+		} catch (Exception exp) {
+			try {
+				throw new TatchaException(exp, tcList);
+			} catch (Exception e) {
+				logger.error("Handling Tatcha Exception " + e.toString());
+			}
 		}
+		// Report Generation for Flow-1
+		if (ReportGenerator.getInstance().generateReport(MODULE, tcList))
+			logger.info("Report Generation Succeeded for: " + MODULE);
+		else
+			logger.info("Report Generation Failed for: " + MODULE);
+
+		logger.info("END testExpressCheckoutLoginUS");
 	}
 
 	/**

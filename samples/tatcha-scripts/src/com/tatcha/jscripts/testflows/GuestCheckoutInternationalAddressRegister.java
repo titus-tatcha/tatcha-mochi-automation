@@ -36,6 +36,7 @@ import com.tatcha.jscripts.commons.TestMethods;
 import com.tatcha.jscripts.dao.Product;
 import com.tatcha.jscripts.dao.TestCase;
 import com.tatcha.jscripts.dao.User;
+import com.tatcha.jscripts.exception.TatchaException;
 import com.tatcha.jscripts.helper.TatchaTestHelper;
 import com.tatcha.jscripts.login.TestLogin;
 import com.tatcha.jscripts.payment.PaymentOption;
@@ -44,182 +45,195 @@ import com.tatcha.jscripts.shipping.ShippingAddress;
 import com.tatcha.utils.BrowserDriver;
 
 /**
- * Flow : Add to cart - Checkout as guest - Add international address - Add Gift card - Register and Place order
+ * Flow-12 : Add to cart - Checkout as guest - Add international address - Add
+ * Gift card - Register and Place order
  * 
  * @author reshma
  *
  */
 public class GuestCheckoutInternationalAddressRegister {
 
-    private WebDriver driver = BrowserDriver.getChromeWebDriver();
-    private boolean acceptNextAlert = true;
-    private StringBuffer verificationErrors = new StringBuffer();
-    private Properties prop = new Properties();
-    private Properties locator = new Properties();
-    private Properties data = new Properties();
+	private WebDriver driver = BrowserDriver.getChromeWebDriver();
+	private boolean acceptNextAlert = true;
+	private StringBuffer verificationErrors = new StringBuffer();
+	private Properties prop = new Properties();
+	private Properties locator = new Properties();
+	private Properties data = new Properties();
 
-    private TatchaTestHelper testHelper = new TatchaTestHelper();
-    private final static Logger logger = Logger.getLogger(GuestCheckoutInternationalAddressRegister.class);
+	private TatchaTestHelper testHelper = new TatchaTestHelper();
+	private final static Logger logger = Logger.getLogger(GuestCheckoutInternationalAddressRegister.class);
 
-    private static TestMethods tmethods;
-    private TestCase testCase;
-    private List<TestCase> tcList = new ArrayList<TestCase>();
-    private final String MODULE = "Flow-12 : GuestCheckoutInternationalAddressRegister";
-        
-    @Before
-    public void setUp() throws Exception {
-        prop.load(new FileInputStream(getClass().getResource("/tatcha.properties").getFile()));
-        locator.load(new FileInputStream(getClass().getResource("/checkoutElementLocator.properties").getFile()));
-        data.load(new FileInputStream(getClass().getResource("/GuestCheckoutInternationalAddressRegister.properties").getFile()));
-        driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+	private static TestMethods tmethods;
+	private TestCase testCase;
+	private List<TestCase> tcList = new ArrayList<TestCase>();
+	private final String MODULE = "Flow-12 : GuestCheckoutInternationalAddressRegister";
 
-        boolean testInLocal = Boolean.parseBoolean(prop.getProperty("testInLocal").toString());
-        if(testInLocal) {            
-            String url = data.getProperty("url").toString();
-            driver.get(url);
-            getTestHelper().basicAuth(url);
-            driver.manage().window().maximize();
-        } else {
-            tmethods = TestMethods.getInstance();
-            String baseUrl = tmethods.getBaseURL();
-            driver.get(baseUrl);
-            driver.manage().window().maximize();
-        }
-    }
+	@Before
+	public void setUp() throws Exception {
+		prop.load(new FileInputStream(getClass().getResource("/tatcha.properties").getFile()));
+		locator.load(new FileInputStream(getClass().getResource("/checkoutElementLocator.properties").getFile()));
+		data.load(new FileInputStream(
+				getClass().getResource("/GuestCheckoutInternationalAddressRegister.properties").getFile()));
+		driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 
-    /**
-     * Test the Checkout flow of guest user with international address
-     * 
-     * @throws Exception
-     */
-    @Test
-    public void testGuestCheckoutInternationalAddressRegister() throws Exception {
+		boolean testInLocal = Boolean.parseBoolean(prop.getProperty("testInLocal").toString());
+		if (testInLocal) {
+			String url = data.getProperty("url").toString();
+			driver.get(url);
+			getTestHelper().basicAuth(url);
+			driver.manage().window().maximize();
+		} else {
+			tmethods = TestMethods.getInstance();
+			String baseUrl = tmethods.getBaseURL();
+			driver.get(baseUrl);
+			driver.manage().window().maximize();
+		}
+	}
 
-        String FUNCTIONALITY = "Checkout as guest with international address and register in order review page";
-        testCase = new TestCase("Flow-12", "MOC-NIL", FUNCTIONALITY, "FAIL", "");
+	/**
+	 * Test the Checkout flow of guest user with international address
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testGuestCheckoutInternationalAddressRegister() throws TatchaException {
 
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy_HH:mm:ss");
-        String timeStamp = sdf.format(Calendar.getInstance().getTime());
-        
-        logger.info(getClass()+timeStamp);
+		String FUNCTIONALITY = "Checkout as guest with international address and register in order review page";
+		testCase = new TestCase("Flow-12", "MOC-NIL", FUNCTIONALITY, "FAIL", "");
 
-        ShippingAddress shipping = new ShippingAddress();
-        PaymentOption payment = new PaymentOption();
-        ReviewOrder reviewOrder = new ReviewOrder();
-        User user = new User();
-        TestAddToCart addToCart = new TestAddToCart();
-        TestLogin testLogin = new TestLogin();
-        
-        Map<String,Boolean> map = new HashMap<String,Boolean>();     
-        map.put("isLogged", false);
-        map.put("isUSAddress", false);
-        map.put("isGiftCard", true);
-        map.put("isCreditCard", false);
-        map.put("isRegister", true);
-        
-        WebDriverWait wait = (WebDriverWait) new WebDriverWait(driver, 10);
-        
-        try {
-            addToCart.addSpecificProductToCart(driver, prop, locator, user, tcList);
-            
-            // wait till shopping bag title is visible and checkout button is clickable
-            wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("h2.panel-title")));
-            wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='cart-table']/div[2]/div/div[2]/button")));
-            
-            // Click checkout button in shopping bag
-            Actions actions = new Actions(driver);
-            WebElement checkoutButtonElement = driver.findElement(By.xpath("//*[@id='cart-table']/div[2]/div/div[2]/button"));
-            actions.moveToElement(checkoutButtonElement).click(checkoutButtonElement);
-            actions.perform();
-            
-            // Login as a registered user at the checkout
-            testLogin.checkoutGuest(driver, data, user, tcList);
-             
-            // Verify shipping address page
-            shipping.verifyShippingAddress(driver, prop, locator, user, map, data, tcList);
-            
-            // Verify payment page
-            payment.verifyPaymentOption2(driver, prop, locator, user, map, tcList);
- 
-            //Verify Review Order
-            reviewOrder.verifyGuestReviewOrder(driver, prop, locator, user, map, data, tcList);
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy_HH:mm:ss");
+		String timeStamp = sdf.format(Calendar.getInstance().getTime());
 
-            wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id='main']/main/div[1]/div/h1")));
-            getTestHelper().logAssertion(getClass().getSimpleName(), "THANK YOU FOR YOUR ORDER", driver.findElement(By.xpath("//*[@id='main']/main/div[1]/div/h1")).getText());
-            timeStamp = sdf.format(Calendar.getInstance().getTime());
-            logger.info("ORDER ID : "+driver.findElement(By.xpath(locator.getProperty("confirmOrder.orderId.label").toString())).getText()+" TIMESTAMP : "+timeStamp);
-//            logger.info("PROFILE DETAILS : "+user.getEmail()+"/"+user.getPassword());
-            
-            testCase.setStatus("PASS");
-            tcList.add(testCase);
-            logger.info("END testGuestCheckoutInternationalAddressRegister");
-            ReportGenerator.getInstance().generateReport(MODULE, tcList);
-        } catch (NoSuchElementException ne) {
-            System.err.println(getClass().getSimpleName() + " : ELEMENT NOT FOUND " + ne.toString());
-        } catch (ElementNotVisibleException nv) {
-            System.err.println(getClass().getSimpleName() + " : ELEMENT NOT VISIBLE " + nv.toString());
-        } catch (TimeoutException te) {
-            System.err.println(getClass().getSimpleName() + " : TIMEOUT " + te.toString());
-        } catch (StaleElementReferenceException sr) {
-            System.err.println(getClass().getSimpleName() + " : STALE ELE REF " + sr.toString());
-        } catch (WebDriverException we) {
-            System.err.println(getClass().getSimpleName() + " : WEBDRIVER ISSUE " + we.toString());
-        }
-    }
-    
-    /**
-     * @return the testHelper
-     */
-    public TatchaTestHelper getTestHelper() {
-        return testHelper;
-    }
+		logger.info(getClass() + timeStamp);
 
-    /**
-     * @param testHelper the testHelper to set
-     */
-    public void setTestHelper(TatchaTestHelper testHelper) {
-        this.testHelper = testHelper;
-    }
+		ShippingAddress shipping = new ShippingAddress();
+		PaymentOption payment = new PaymentOption();
+		ReviewOrder reviewOrder = new ReviewOrder();
+		User user = new User();
+		TestAddToCart addToCart = new TestAddToCart();
+		TestLogin testLogin = new TestLogin();
 
-    @After
-    public void tearDown() throws Exception {
-        driver.quit();
-        String verificationErrorString = verificationErrors.toString();
-        if (!"".equals(verificationErrorString)) {
-            fail(verificationErrorString);
-        }
-    }
+		Map<String, Boolean> map = new HashMap<String, Boolean>();
+		map.put("isLogged", false);
+		map.put("isUSAddress", false);
+		map.put("isGiftCard", true);
+		map.put("isCreditCard", false);
+		map.put("isRegister", true);
 
-    private boolean isElementPresent(By by) {
-        try {
-            driver.findElement(by);
-            return true;
-        } catch (NoSuchElementException e) {
-            return false;
-        }
-    }
+		WebDriverWait wait = (WebDriverWait) new WebDriverWait(driver, 10);
 
-    private boolean isAlertPresent() {
-        try {
-            driver.switchTo().alert();
-            return true;
-        } catch (NoAlertPresentException e) {
-            return false;
-        }
-    }
+		try {
+			addToCart.addSpecificProductToCart(driver, prop, locator, user, tcList);
 
-    private String closeAlertAndGetItsText() {
-        try {
-            Alert alert = driver.switchTo().alert();
-            String alertText = alert.getText();
-            if (acceptNextAlert) {
-                alert.accept();
-            } else {
-                alert.dismiss();
-            }
-            return alertText;
-        } finally {
-            acceptNextAlert = true;
-        }
-    }
+			// wait till shopping bag title is visible and checkout button is
+			// clickable
+			wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("h2.panel-title")));
+			wait.until(ExpectedConditions
+					.elementToBeClickable(By.xpath("//*[@id='cart-table']/div[2]/div/div[2]/button")));
+
+			// Click checkout button in shopping bag
+			Actions actions = new Actions(driver);
+			WebElement checkoutButtonElement = driver
+					.findElement(By.xpath("//*[@id='cart-table']/div[2]/div/div[2]/button"));
+			actions.moveToElement(checkoutButtonElement).click(checkoutButtonElement);
+			actions.perform();
+
+			// Login as a registered user at the checkout
+			testLogin.checkoutGuest(driver, data, user, tcList);
+
+			// Verify shipping address page
+			shipping.verifyShippingAddress(driver, prop, locator, user, map, data, tcList);
+
+			// Verify payment page
+			payment.verifyPaymentOption2(driver, prop, locator, user, map, tcList);
+
+			// Verify Review Order
+			reviewOrder.verifyGuestReviewOrder(driver, prop, locator, user, map, data, tcList);
+
+			wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id='main']/main/div[1]/div/h1")));
+			getTestHelper().logAssertion(getClass().getSimpleName(), "THANK YOU FOR YOUR ORDER",
+					driver.findElement(By.xpath("//*[@id='main']/main/div[1]/div/h1")).getText());
+			timeStamp = sdf.format(Calendar.getInstance().getTime());
+			logger.info("ORDER ID : " + driver
+					.findElement(By.xpath(locator.getProperty("confirmOrder.orderId.label").toString())).getText()
+					+ " TIMESTAMP : " + timeStamp);
+			// logger.info("PROFILE DETAILS :
+			// "+user.getEmail()+"/"+user.getPassword());
+
+			testCase.setStatus("PASS");
+			tcList.add(testCase);
+
+		} catch (Exception exp) {
+			try {
+				throw new TatchaException(exp, tcList);
+			} catch (Exception e) {
+				logger.error("Handling Tatcha Exception " + e.toString());
+			}
+		}
+		// Report Generation for Flow-15
+		if (ReportGenerator.getInstance().generateReport(MODULE, tcList))
+			logger.info("Report Generation Succeeded for: " + MODULE);
+		else
+			logger.info("Report Generation Failed for: " + MODULE);
+
+		logger.info("END testGuestCheckoutInternationalAddressRegister");
+
+	}
+
+	/**
+	 * @return the testHelper
+	 */
+	public TatchaTestHelper getTestHelper() {
+		return testHelper;
+	}
+
+	/**
+	 * @param testHelper
+	 *            the testHelper to set
+	 */
+	public void setTestHelper(TatchaTestHelper testHelper) {
+		this.testHelper = testHelper;
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		driver.quit();
+		String verificationErrorString = verificationErrors.toString();
+		if (!"".equals(verificationErrorString)) {
+			fail(verificationErrorString);
+		}
+	}
+
+	private boolean isElementPresent(By by) {
+		try {
+			driver.findElement(by);
+			return true;
+		} catch (NoSuchElementException e) {
+			return false;
+		}
+	}
+
+	private boolean isAlertPresent() {
+		try {
+			driver.switchTo().alert();
+			return true;
+		} catch (NoAlertPresentException e) {
+			return false;
+		}
+	}
+
+	private String closeAlertAndGetItsText() {
+		try {
+			Alert alert = driver.switchTo().alert();
+			String alertText = alert.getText();
+			if (acceptNextAlert) {
+				alert.accept();
+			} else {
+				alert.dismiss();
+			}
+			return alertText;
+		} finally {
+			acceptNextAlert = true;
+		}
+	}
 }

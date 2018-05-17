@@ -18,8 +18,15 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import com.tatcha.jscripts.commons.ReportGenerator;
 import com.tatcha.jscripts.commons.TestMethods;
 import com.tatcha.jscripts.dao.TestCase;
+import com.tatcha.jscripts.exception.TatchaException;
 import com.xceptance.xlt.api.engine.scripting.AbstractWebDriverScriptTestCase;
 
+/**
+ * Tests Footer Menu Links wrt DEV_Footer.properties MOC 39
+ * 
+ * @author titus
+ *
+ */
 public class TestFooter extends AbstractWebDriverScriptTestCase {
 
 	private final static Logger logger = Logger.getLogger(TestFooter.class);
@@ -47,30 +54,39 @@ public class TestFooter extends AbstractWebDriverScriptTestCase {
 	}
 
 	@Test
-	public void testFooter() throws Exception {
+	public void testFooter() throws TatchaException {
 		logger.info("inside TestFooter ");
 		tcList = new ArrayList<TestCase>();
-		baseUrl = tmethods.getBaseURL();
-		driver.get(baseUrl);
-		driver.manage().window().maximize();
+		try {
+			baseUrl = tmethods.getBaseURL();
+			driver.get(baseUrl);
+			driver.manage().window().maximize();
 
-		/** Closing News Letter Popup */
-		tmethods.testNewsLetterPopupModal(driver);
+			/** Closing News Letter Popup */
+			tmethods.testNewsLetterPopupModal(driver);
 
-		Properties prop = new Properties();
-		prop = tmethods.getInstance().getEnvPropertyFile();
+			Properties prop = new Properties();
+			prop = tmethods.getInstance().getEnvPropertyFile();
 
-		/** Checking 5 Footer Links */
-		int totalNoOfCategories = 4;
-		for (int MENUNUM = 1; MENUNUM <= totalNoOfCategories; MENUNUM++) {
-			String[] footerLinks = prop.get("footer.links." + MENUNUM).toString().split("#");
-			callFooterMenus(driver, footerLinks, MENUNUM);
+			/** Checking 5 Footer Links */
+			int totalNoOfCategories = 4;
+			for (int MENUNUM = 1; MENUNUM <= totalNoOfCategories; MENUNUM++) {
+				String[] footerLinks = prop.get("footer.links." + MENUNUM).toString().split("#");
+				callFooterMenus(driver, footerLinks, MENUNUM);
+			}
+
+			testSocialMedia(driver, prop);
+			// social media next page titles needs to be checked
+			testPrivacyAndTerms(driver, prop);
+			// Footer account Info and Order Status is automated in MyLogin.java
+
+		} catch (Exception exp) {
+			try {
+				throw new TatchaException(exp, tcList);
+			} catch (Exception e) {
+				logger.error("Handling Tatcha Exception " + e.toString());
+			}
 		}
-
-//		testSocialMedia(driver, prop);
-		// social media next page titles needs to be checked
-//		testPrivacyAndTerms(driver, prop);
-		// Footer account Info and Order Status is automated in MyLogin.java
 
 		// Report Generation for PDP Module
 		ReportGenerator.getInstance().generateReport(MODULE, tcList);
