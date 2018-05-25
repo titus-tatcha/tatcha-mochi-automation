@@ -55,10 +55,12 @@ public class TatchaException extends Exception {
 		}else {
 			REMARKS = "Unknown Exception";
 		}
+		
 		TestCase tc = new TestCase(TcConstants.TC_ERR, TcConstants.MOC_ERR, TcConstants.FUN_ERR, TcConstants.FAIL,
 				REMARKS);
 		tcList.add(tc);
 		logger.error(exp.toString());
+
 	}
 
 }

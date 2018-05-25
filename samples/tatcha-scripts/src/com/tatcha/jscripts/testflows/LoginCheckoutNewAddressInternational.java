@@ -145,7 +145,7 @@ public class LoginCheckoutNewAddressInternational {
 			payment.verifyPaymentOption2(driver, prop, locator, user, map, tcList);
 
 			// Verify Review Order
-			reviewOrder.verifyReviewOrder2(driver, prop, locator, user, map, tcList);
+			reviewOrder.verifyReviewOrder2(driver, prop, locator, user, map, tcList,false);
 
 			wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id='main']/main/div[1]/div/h1")));
 			getTestHelper().logAssertion(getClass().getSimpleName(), "THANK YOU FOR YOUR ORDER",

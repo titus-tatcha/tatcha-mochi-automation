@@ -85,7 +85,7 @@ public class TestPDP extends AbstractWebDriverScriptTestCase {
 	 */
 
 	@Test
-	public void testPDP() throws TatchaException {
+	public void testPDP() throws Exception {
 
 		tcList = new ArrayList<TestCase>();
 		try {
