@@ -16,10 +16,7 @@ import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
-import org.openqa.selenium.NoAlertPresentException;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -36,10 +33,8 @@ import com.tatcha.jscripts.exception.TatchaException;
 import com.tatcha.jscripts.helper.TatchaTestHelper;
 import com.tatcha.jscripts.login.TestLogin;
 import com.tatcha.jscripts.review.ReviewOrder;
-import com.tatcha.jscripts.summary.TestItems;
 import com.tatcha.jscripts.summary.TestSummary;
 import com.tatcha.utils.BrowserDriver;
-
 
 /**
  * Flow : 16
@@ -50,7 +45,6 @@ import com.tatcha.utils.BrowserDriver;
 public class ProductGiftCertificateCheckout {
 
     private WebDriver driver = BrowserDriver.getChromeWebDriver();
-    private boolean acceptNextAlert = true;
     private StringBuffer verificationErrors = new StringBuffer();
     private Properties prop = new Properties();
     private Properties locator = new Properties();
@@ -77,13 +71,10 @@ public class ProductGiftCertificateCheckout {
         if (testInLocal) {
             String url = data.getProperty("url").toString();
             driver.get(url);
-            getTestHelper().basicAuth(url);
-            driver.manage().window().maximize();
         } else {
             tmethods = TestMethods.getInstance();
             String baseUrl = tmethods.getBaseURL();
             driver.get(baseUrl);
-            driver.manage().window().maximize();
         }
     }
 
@@ -101,13 +92,14 @@ public class ProductGiftCertificateCheckout {
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy_HH:mm:ss");
         String timeStamp = sdf.format(Calendar.getInstance().getTime());
+        logger.info(getClass() + timeStamp);
+
         Actions action = new Actions(driver);
 
         ReviewOrder reviewOrder = new ReviewOrder();
         User user = new User();
         TestAddToCart addToCart = new TestAddToCart();
         TestLogin testLogin = new TestLogin();
-        TestItems testItems = new TestItems();
         TestSummary testSummary = new TestSummary();
 
         Map<String, Boolean> map = new HashMap<String, Boolean>();
@@ -163,18 +155,16 @@ public class ProductGiftCertificateCheckout {
         } catch (Exception exp) {
             try {
                 throw new TatchaException(exp, tcList);
-            } catch(Exception exe) {
-                logger.error(exe.toString());
+            } catch (Exception e) {
+                logger.error("Handling Tatcha Exception " + e.toString());
             }
-            logger.error("EXCEPTION", new Throwable(exp));
         }
-        
-		// Report Generation for Flow-16
-		if (ReportGenerator.getInstance().generateReport(MODULE, tcList))
-			logger.info("Report Generation Succeeded for: " + MODULE);
-		else
-			logger.info("Report Generation Failed for: " + MODULE);
-		
+        boolean generateReport = Boolean.parseBoolean(prop.getProperty("generateReport").toString());
+        if (generateReport && ReportGenerator.getInstance().generateReport(MODULE, tcList)) {
+            logger.info("Report Generation Succeeded for: " + MODULE);
+        } else {
+            logger.info("Report Generation Failed for: " + MODULE);
+        }
         logger.info("END testProductGiftCertificateCheckout");
     }
 
@@ -199,39 +189,6 @@ public class ProductGiftCertificateCheckout {
         String verificationErrorString = verificationErrors.toString();
         if (!"".equals(verificationErrorString)) {
             fail(verificationErrorString);
-        }
-    }
-
-    private boolean isElementPresent(By by) {
-        try {
-            driver.findElement(by);
-            return true;
-        } catch (NoSuchElementException e) {
-            return false;
-        }
-    }
-
-    private boolean isAlertPresent() {
-        try {
-            driver.switchTo().alert();
-            return true;
-        } catch (NoAlertPresentException e) {
-            return false;
-        }
-    }
-
-    private String closeAlertAndGetItsText() {
-        try {
-            Alert alert = driver.switchTo().alert();
-            String alertText = alert.getText();
-            if (acceptNextAlert) {
-                alert.accept();
-            } else {
-                alert.dismiss();
-            }
-            return alertText;
-        } finally {
-            acceptNextAlert = true;
         }
     }
 }

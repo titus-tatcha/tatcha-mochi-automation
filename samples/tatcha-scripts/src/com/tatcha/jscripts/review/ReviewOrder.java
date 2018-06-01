@@ -13,7 +13,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.tatcha.jscripts.dao.TestCase;
 import com.tatcha.jscripts.dao.User;
-import com.tatcha.jscripts.exception.TatchaException;
 import com.tatcha.jscripts.helper.TatchaTestHelper;
 import com.tatcha.jscripts.summary.TestItems;
 import com.tatcha.jscripts.summary.TestSummary;
@@ -43,46 +42,38 @@ public class ReviewOrder {
      */
     public void verifyReviewOrder1(WebDriver driver, Properties prop, Properties locator, User user,
             Map<String, Boolean> map, List<TestCase> tcList) throws Exception {
-        try {
-            logger.info("BEGIN verifyReviewOrder");
-            String FUNCTIONALITY = "Verify Review order and edit button of shipping and payment section";
-            testCase = new TestCase("TC-9.1", "MOC-NIL", FUNCTIONALITY, "FAIL", "");
 
-            WebDriverWait wait = (WebDriverWait) new WebDriverWait(driver, 10);
+        logger.info("BEGIN verifyReviewOrder");
+        String FUNCTIONALITY = "Verify Review order and edit button of shipping and payment section";
+        testCase = new TestCase("TC-9.1", "MOC-NIL", FUNCTIONALITY, "FAIL", "");
 
-            wait.until(ExpectedConditions
-                    .visibilityOfElementLocated(By.cssSelector(locator.getProperty("checkout.title").toString())));
-            wait.until(ExpectedConditions
-                    .visibilityOfElementLocated(By.xpath(locator.getProperty("checkout.step3.title").toString())));
+        WebDriverWait wait = (WebDriverWait) new WebDriverWait(driver, 10);
 
-            TestShippingSection testShipping = new TestShippingSection();
-            testShipping.testShippingSection(driver, prop, locator, user, map, tcList);
-            TestPaymentSection testPayment = new TestPaymentSection();
-            testPayment.testPaymentSection(driver, prop, locator, user, map, tcList);
-            TestReviewOrder testReview = new TestReviewOrder();
-            testReview.testReviewOrder(driver, prop, locator, user, map, tcList);
-            TestSummary testSummary = new TestSummary();
-            testSummary.testSummary(driver, prop, locator, user, map, tcList);
-            TestItems testItem = new TestItems();
-            testItem.testItems(driver, prop, locator, user, map, tcList);
+        wait.until(ExpectedConditions
+                .visibilityOfElementLocated(By.cssSelector(locator.getProperty("checkout.title").toString())));
+        wait.until(ExpectedConditions
+                .visibilityOfElementLocated(By.xpath(locator.getProperty("checkout.step3.title").toString())));
 
-            // Click place order button
-            By placeOrderButtonLocator = By.xpath(locator.getProperty("reviewOrder.placeOrder.button").toString());
-            WebElement placeOrderButtonElement = driver.findElement(placeOrderButtonLocator);
-            if (placeOrderButtonElement.isEnabled()) {
-                placeOrderButtonElement.click();
-            }
-            testCase.setStatus("PASS");
-            tcList.add(testCase);
-            logger.info("END verifyReviewOrder");
-        } catch (Exception exp) {
-            try {
-                throw new TatchaException(exp, tcList);
-            } catch(Exception exe) {
-                logger.error(exe.toString());
-            }
-            logger.error("EXCEPTION", new Throwable(exp));
+        TestShippingSection testShipping = new TestShippingSection();
+        testShipping.testShippingSection(driver, prop, locator, user, map, tcList);
+        TestPaymentSection testPayment = new TestPaymentSection();
+        testPayment.testPaymentSection(driver, prop, locator, user, map, tcList);
+        TestReviewOrder testReview = new TestReviewOrder();
+        testReview.testReviewOrder(driver, prop, locator, user, map, tcList);
+        TestSummary testSummary = new TestSummary();
+        testSummary.testSummary(driver, prop, locator, user, map, tcList);
+        TestItems testItem = new TestItems();
+        testItem.testItems(driver, prop, locator, user, map, tcList);
+
+        // Click place order button
+        By placeOrderButtonLocator = By.xpath(locator.getProperty("reviewOrder.placeOrder.button").toString());
+        WebElement placeOrderButtonElement = driver.findElement(placeOrderButtonLocator);
+        if (placeOrderButtonElement.isEnabled()) {
+            placeOrderButtonElement.click();
         }
+        testCase.setStatus("PASS");
+        tcList.add(testCase);
+        logger.info("END verifyReviewOrder");
     }
 
     /**
@@ -98,44 +89,36 @@ public class ReviewOrder {
      */
     public void verifyReviewOrder2(WebDriver driver, Properties prop, Properties locator, User user,
             Map<String, Boolean> map, List<TestCase> tcList, boolean doPlaceOrder) throws Exception {
-//        try {
-            logger.info("BEGIN verifyReviewOrder2");
-            String FUNCTIONALITY = "Verify Review order page";
-            testCase = new TestCase("TC-9.2", "MOC-NIL", FUNCTIONALITY, "FAIL", "");
 
-            WebDriverWait wait = (WebDriverWait) new WebDriverWait(driver, 10);
+        logger.info("BEGIN verifyReviewOrder2");
+        String FUNCTIONALITY = "Verify Review order page";
+        testCase = new TestCase("TC-9.2", "MOC-NIL", FUNCTIONALITY, "FAIL", "");
 
-            wait.until(ExpectedConditions
-                    .visibilityOfElementLocated(By.cssSelector(locator.getProperty("checkout.title").toString())));
-            wait.until(ExpectedConditions
-                    .visibilityOfElementLocated(By.xpath(locator.getProperty("checkout.step3.title").toString())));
+        WebDriverWait wait = (WebDriverWait) new WebDriverWait(driver, 10);
 
-            TestShippingSection testShipping = new TestShippingSection();
-            testShipping.testReviewShipping(driver, prop, locator, user, map, tcList);
-            TestPaymentSection testPayment = new TestPaymentSection();
-            testPayment.testReviewPayment(driver, prop, locator, user, map, tcList);
-            TestReviewOrder testReview = new TestReviewOrder();
-            testReview.testReviewOrder(driver, prop, locator, user, map, tcList);
+        wait.until(ExpectedConditions
+                .visibilityOfElementLocated(By.cssSelector(locator.getProperty("checkout.title").toString())));
+        wait.until(ExpectedConditions
+                .visibilityOfElementLocated(By.xpath(locator.getProperty("checkout.step3.title").toString())));
 
-            if (doPlaceOrder) {
-                // Click place order button
-                By placeOrderButtonLocator = By.xpath(locator.getProperty("reviewOrder.placeOrder.button").toString());
-                WebElement placeOrderButtonElement = driver.findElement(placeOrderButtonLocator);
-                if (placeOrderButtonElement.isEnabled()) {
-                    placeOrderButtonElement.click();
-                }
+        TestShippingSection testShipping = new TestShippingSection();
+        testShipping.testReviewShipping(driver, prop, locator, user, map, tcList);
+        TestPaymentSection testPayment = new TestPaymentSection();
+        testPayment.testReviewPayment(driver, prop, locator, user, map, tcList);
+        TestReviewOrder testReview = new TestReviewOrder();
+        testReview.testReviewOrder(driver, prop, locator, user, map, tcList);
+
+        if (doPlaceOrder) {
+            // Click place order button
+            By placeOrderButtonLocator = By.xpath(locator.getProperty("reviewOrder.placeOrder.button").toString());
+            WebElement placeOrderButtonElement = driver.findElement(placeOrderButtonLocator);
+            if (placeOrderButtonElement.isEnabled()) {
+                placeOrderButtonElement.click();
             }
-            testCase.setStatus("PASS");
-            tcList.add(testCase);
-            logger.info("END verifyReviewOrder2");
-//        } catch (Exception exp) {
-//            try {
-//                throw new TatchaException(exp, tcList);
-//            } catch(Exception exe) {
-//                logger.error(exe.toString());
-//            }
-//            logger.error("EXCEPTION", new Throwable(exp));
-//        }
+        }
+        testCase.setStatus("PASS");
+        tcList.add(testCase);
+        logger.info("END verifyReviewOrder2");
     }
 
     /**
@@ -151,46 +134,38 @@ public class ReviewOrder {
      */
     public void verifyReviewOrder3(WebDriver driver, Properties prop, Properties locator, User user,
             Map<String, Boolean> map, List<TestCase> tcList) throws Exception {
-        try {
-            logger.info("BEGIN verifyReviewOrder3");
-            String FUNCTIONALITY = "Verify Review order and edit shipping and payment section separately";
-            testCase = new TestCase("TC-9.3", "MOC-NIL", FUNCTIONALITY, "FAIL", "");
 
-            WebDriverWait wait = (WebDriverWait) new WebDriverWait(driver, 10);
+        logger.info("BEGIN verifyReviewOrder3");
+        String FUNCTIONALITY = "Verify Review order and edit shipping and payment section separately";
+        testCase = new TestCase("TC-9.3", "MOC-NIL", FUNCTIONALITY, "FAIL", "");
 
-            wait.until(ExpectedConditions
-                    .visibilityOfElementLocated(By.cssSelector(locator.getProperty("checkout.title").toString())));
-            wait.until(ExpectedConditions
-                    .visibilityOfElementLocated(By.xpath(locator.getProperty("checkout.step3.title").toString())));
+        WebDriverWait wait = (WebDriverWait) new WebDriverWait(driver, 10);
 
-            TestShippingSection testShipping = new TestShippingSection();
-            testShipping.testEditShipping(driver, prop, locator, user, map, tcList);
-            TestPaymentSection testPayment = new TestPaymentSection();
-            testPayment.testEditPayment(driver, prop, locator, user, map, tcList);
-            TestReviewOrder testReview = new TestReviewOrder();
-            testReview.testReviewOrder(driver, prop, locator, user, map, tcList);
-            TestSummary testSummary = new TestSummary();
-            testSummary.testSummary(driver, prop, locator, user, map, tcList);
-            TestItems testItem = new TestItems();
-            testItem.testItems(driver, prop, locator, user, map, tcList);
+        wait.until(ExpectedConditions
+                .visibilityOfElementLocated(By.cssSelector(locator.getProperty("checkout.title").toString())));
+        wait.until(ExpectedConditions
+                .visibilityOfElementLocated(By.xpath(locator.getProperty("checkout.step3.title").toString())));
 
-            // Click place order button
-            By placeOrderButtonLocator = By.xpath(locator.getProperty("reviewOrder.placeOrder.button").toString());
-            WebElement placeOrderButtonElement = driver.findElement(placeOrderButtonLocator);
-            if (placeOrderButtonElement.isEnabled()) {
-                placeOrderButtonElement.click();
-            }
-            testCase.setStatus("PASS");
-            tcList.add(testCase);
-            logger.info("END verifyReviewOrder3");
-        } catch (Exception exp) {
-            try {
-                throw new TatchaException(exp, tcList);
-            } catch(Exception exe) {
-                logger.error(exe.toString());
-            }
-            logger.error("EXCEPTION", new Throwable(exp));
+        TestShippingSection testShipping = new TestShippingSection();
+        testShipping.testEditShipping(driver, prop, locator, user, map, tcList);
+        TestPaymentSection testPayment = new TestPaymentSection();
+        testPayment.testEditPayment(driver, prop, locator, user, map, tcList);
+        TestReviewOrder testReview = new TestReviewOrder();
+        testReview.testReviewOrder(driver, prop, locator, user, map, tcList);
+        TestSummary testSummary = new TestSummary();
+        testSummary.testSummary(driver, prop, locator, user, map, tcList);
+        TestItems testItem = new TestItems();
+        testItem.testItems(driver, prop, locator, user, map, tcList);
+
+        // Click place order button
+        By placeOrderButtonLocator = By.xpath(locator.getProperty("reviewOrder.placeOrder.button").toString());
+        WebElement placeOrderButtonElement = driver.findElement(placeOrderButtonLocator);
+        if (placeOrderButtonElement.isEnabled()) {
+            placeOrderButtonElement.click();
         }
+        testCase.setStatus("PASS");
+        tcList.add(testCase);
+        logger.info("END verifyReviewOrder3");
     }
 
     /**
@@ -206,47 +181,39 @@ public class ReviewOrder {
      */
     public void verifyReviewOrder4(WebDriver driver, Properties prop, Properties locator, User user,
             Map<String, Boolean> map, List<TestCase> tcList) throws Exception {
-        try {
-            logger.info("BEGIN verifyReviewOrder4");
-            String FUNCTIONALITY = "Verify review order and edit shipping and payment";
-            testCase = new TestCase("TC-9.4", "MOC-NIL", FUNCTIONALITY, "FAIL", "");
 
-            WebDriverWait wait = (WebDriverWait) new WebDriverWait(driver, 10);
+        logger.info("BEGIN verifyReviewOrder4");
+        String FUNCTIONALITY = "Verify review order and edit shipping and payment";
+        testCase = new TestCase("TC-9.4", "MOC-NIL", FUNCTIONALITY, "FAIL", "");
 
-            wait.until(ExpectedConditions
-                    .visibilityOfElementLocated(By.cssSelector(locator.getProperty("checkout.title").toString())));
-            wait.until(ExpectedConditions
-                    .visibilityOfElementLocated(By.xpath(locator.getProperty("checkout.step3.title").toString())));
+        WebDriverWait wait = (WebDriverWait) new WebDriverWait(driver, 10);
 
-            TestShippingSection testShipping = new TestShippingSection();
-            testShipping.testEditShipping(driver, prop, locator, user, map, tcList);
-            TestPaymentSection testPayment = new TestPaymentSection();
-            testPayment.testEditPaymentBilling(driver, prop, locator, user, map, tcList);
-            testPayment.testReviewPayment(driver, prop, locator, user, map, tcList);
-            TestReviewOrder testReview = new TestReviewOrder();
-            testReview.testReviewOrder(driver, prop, locator, user, map, tcList);
-            TestSummary testSummary = new TestSummary();
-            testSummary.testSummary(driver, prop, locator, user, map, tcList);
-            TestItems testItem = new TestItems();
-            testItem.testItems(driver, prop, locator, user, map, tcList);
+        wait.until(ExpectedConditions
+                .visibilityOfElementLocated(By.cssSelector(locator.getProperty("checkout.title").toString())));
+        wait.until(ExpectedConditions
+                .visibilityOfElementLocated(By.xpath(locator.getProperty("checkout.step3.title").toString())));
 
-            // Click place order button
-            By placeOrderButtonLocator = By.xpath(locator.getProperty("reviewOrder.placeOrder.button").toString());
-            WebElement placeOrderButtonElement = driver.findElement(placeOrderButtonLocator);
-            if (placeOrderButtonElement.isEnabled()) {
-                placeOrderButtonElement.click();
-            }
-            testCase.setStatus("PASS");
-            tcList.add(testCase);
-            logger.info("END verifyReviewOrder4");
-        } catch (Exception exp) {
-            try {
-                throw new TatchaException(exp, tcList);
-            } catch(Exception exe) {
-                logger.error(exe.toString());
-            }
-            logger.error("EXCEPTION", new Throwable(exp));
+        TestShippingSection testShipping = new TestShippingSection();
+        testShipping.testEditShipping(driver, prop, locator, user, map, tcList);
+        TestPaymentSection testPayment = new TestPaymentSection();
+        testPayment.testEditPaymentBilling(driver, prop, locator, user, map, tcList);
+        testPayment.testReviewPayment(driver, prop, locator, user, map, tcList);
+        TestReviewOrder testReview = new TestReviewOrder();
+        testReview.testReviewOrder(driver, prop, locator, user, map, tcList);
+        TestSummary testSummary = new TestSummary();
+        testSummary.testSummary(driver, prop, locator, user, map, tcList);
+        TestItems testItem = new TestItems();
+        testItem.testItems(driver, prop, locator, user, map, tcList);
+
+        // Click place order button
+        By placeOrderButtonLocator = By.xpath(locator.getProperty("reviewOrder.placeOrder.button").toString());
+        WebElement placeOrderButtonElement = driver.findElement(placeOrderButtonLocator);
+        if (placeOrderButtonElement.isEnabled()) {
+            placeOrderButtonElement.click();
         }
+        testCase.setStatus("PASS");
+        tcList.add(testCase);
+        logger.info("END verifyReviewOrder4");
     }
 
     /**
@@ -262,42 +229,34 @@ public class ReviewOrder {
      */
     public void verifyEGiftReviewOrder(WebDriver driver, Properties prop, Properties locator, User user,
             Map<String, Boolean> map, List<TestCase> tcList) throws Exception {
-        try {
-            logger.info("BEGIN verifyEGiftReviewOrder");
-            String FUNCTIONALITY = "Verify Review order when EGift Certificate only in cart";
-            testCase = new TestCase("TC-9.5", "MOC-NIL", FUNCTIONALITY, "FAIL", "");
 
-            WebDriverWait wait = (WebDriverWait) new WebDriverWait(driver, 10);
+        logger.info("BEGIN verifyEGiftReviewOrder");
+        String FUNCTIONALITY = "Verify Review order when EGift Certificate only in cart";
+        testCase = new TestCase("TC-9.5", "MOC-NIL", FUNCTIONALITY, "FAIL", "");
 
-            wait.until(ExpectedConditions
-                    .visibilityOfElementLocated(By.cssSelector(locator.getProperty("checkout.title").toString())));
-            wait.until(ExpectedConditions
-                    .visibilityOfElementLocated(By.xpath("//*[@id='ext-gen44']/body/main/div[1]/div/ul/li[2]/a")));
+        WebDriverWait wait = (WebDriverWait) new WebDriverWait(driver, 10);
 
-            TestPaymentSection testPayment = new TestPaymentSection();
-            testPayment.testReviewEGiftPayment(driver, prop, locator, user, map, tcList);
-            TestSummary testSummary = new TestSummary();
-            testSummary.testEgiftSummary(driver, prop, locator, user, map, tcList);
-            TestItems testItem = new TestItems();
-            testItem.testEgiftItem(driver, prop, locator, user, map, tcList);
+        wait.until(ExpectedConditions
+                .visibilityOfElementLocated(By.cssSelector(locator.getProperty("checkout.title").toString())));
+        wait.until(ExpectedConditions
+                .visibilityOfElementLocated(By.xpath("//*[@id='ext-gen44']/body/main/div[1]/div/ul/li[2]/a")));
 
-            // Click place order button
-            By placeOrderButtonLocator = By.xpath(locator.getProperty("reviewOrder.placeOrder.button").toString());
-            WebElement placeOrderButtonElement = driver.findElement(placeOrderButtonLocator);
-            if (placeOrderButtonElement.isEnabled()) {
-                placeOrderButtonElement.click();
-            }
-            testCase.setStatus("PASS");
-            tcList.add(testCase);
-            logger.info("END verifyEGiftReviewOrder");
-        } catch (Exception exp) {
-            try {
-                throw new TatchaException(exp, tcList);
-            } catch(Exception exe) {
-                logger.error(exe.toString());
-            }
-            logger.error("EXCEPTION", new Throwable(exp));
+        TestPaymentSection testPayment = new TestPaymentSection();
+        testPayment.testReviewEGiftPayment(driver, prop, locator, user, map, tcList);
+        TestSummary testSummary = new TestSummary();
+        testSummary.testEgiftSummary(driver, prop, locator, user, map, tcList);
+        TestItems testItem = new TestItems();
+        testItem.testEgiftItem(driver, prop, locator, user, map, tcList);
+
+        // Click place order button
+        By placeOrderButtonLocator = By.xpath(locator.getProperty("reviewOrder.placeOrder.button").toString());
+        WebElement placeOrderButtonElement = driver.findElement(placeOrderButtonLocator);
+        if (placeOrderButtonElement.isEnabled()) {
+            placeOrderButtonElement.click();
         }
+        testCase.setStatus("PASS");
+        tcList.add(testCase);
+        logger.info("END verifyEGiftReviewOrder");
     }
 
     /**
@@ -315,44 +274,36 @@ public class ReviewOrder {
      */
     public void verifyGuestReviewOrder(WebDriver driver, Properties prop, Properties locator, User user,
             Map<String, Boolean> map, Properties data, List<TestCase> tcList) throws Exception {
-        try {
-            logger.info("BEGIN verifyGuestReviewOrder");
-            String FUNCTIONALITY = "Verify Review Order for guest checkout";
-            testCase = new TestCase("TC-9.6", "MOC-NIL", FUNCTIONALITY, "FAIL", "");
 
-            WebDriverWait wait = (WebDriverWait) new WebDriverWait(driver, 10);
+        logger.info("BEGIN verifyGuestReviewOrder");
+        String FUNCTIONALITY = "Verify Review Order for guest checkout";
+        testCase = new TestCase("TC-9.6", "MOC-NIL", FUNCTIONALITY, "FAIL", "");
 
-            wait.until(ExpectedConditions
-                    .visibilityOfElementLocated(By.cssSelector(locator.getProperty("checkout.title").toString())));
-            wait.until(ExpectedConditions
-                    .visibilityOfElementLocated(By.xpath(locator.getProperty("checkout.step3.title").toString())));
+        WebDriverWait wait = (WebDriverWait) new WebDriverWait(driver, 10);
 
-            TestShippingSection testShipping = new TestShippingSection();
-            testShipping.testReviewShipping(driver, prop, locator, user, map, tcList);
-            TestPaymentSection testPayment = new TestPaymentSection();
-            testPayment.testReviewPayment(driver, prop, locator, user, map, tcList);
-            TestCreateAccount testCreateAccnt = new TestCreateAccount();
-            testCreateAccnt.testCreateAccount(driver, prop, locator, user, map, data, tcList);
-            TestReviewOrder testReview = new TestReviewOrder();
-            testReview.testGuestReviewOrder(driver, prop, locator, user, map, data, tcList);
+        wait.until(ExpectedConditions
+                .visibilityOfElementLocated(By.cssSelector(locator.getProperty("checkout.title").toString())));
+        wait.until(ExpectedConditions
+                .visibilityOfElementLocated(By.xpath(locator.getProperty("checkout.step3.title").toString())));
 
-            // Click place order button
-            By placeOrderButtonLocator = By.xpath(locator.getProperty("reviewOrder.placeOrder.button").toString());
-            WebElement placeOrderButtonElement = driver.findElement(placeOrderButtonLocator);
-            if (placeOrderButtonElement.isEnabled()) {
-                placeOrderButtonElement.click();
-            }
-            testCase.setStatus("PASS");
-            tcList.add(testCase);
-            logger.info("END verifyGuestReviewOrder");
-        } catch (Exception exp) {
-            try {
-                throw new TatchaException(exp, tcList);
-            } catch(Exception exe) {
-                logger.error(exe.toString());
-            }
-            logger.error("EXCEPTION", new Throwable(exp));
+        TestShippingSection testShipping = new TestShippingSection();
+        testShipping.testReviewShipping(driver, prop, locator, user, map, tcList);
+        TestPaymentSection testPayment = new TestPaymentSection();
+        testPayment.testReviewPayment(driver, prop, locator, user, map, tcList);
+        TestCreateAccount testCreateAccnt = new TestCreateAccount();
+        testCreateAccnt.testCreateAccount(driver, prop, locator, user, map, data, tcList);
+        TestReviewOrder testReview = new TestReviewOrder();
+        testReview.testGuestReviewOrder(driver, prop, locator, user, map, data, tcList);
+
+        // Click place order button
+        By placeOrderButtonLocator = By.xpath(locator.getProperty("reviewOrder.placeOrder.button").toString());
+        WebElement placeOrderButtonElement = driver.findElement(placeOrderButtonLocator);
+        if (placeOrderButtonElement.isEnabled()) {
+            placeOrderButtonElement.click();
         }
+        testCase.setStatus("PASS");
+        tcList.add(testCase);
+        logger.info("END verifyGuestReviewOrder");
     }
 
     /**

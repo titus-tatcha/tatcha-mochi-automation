@@ -1,7 +1,5 @@
 package com.tatcha.jscripts.myaccount;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.List;
 import java.util.Properties;
 
@@ -19,14 +17,14 @@ import com.tatcha.jscripts.helper.TatchaTestHelper;
 
 /**
  * 
- * @author reshma
+ * @author Reshma
  * 
- * Class that contains method to verify the 
- * Address Book activities of My Account
+ *         Class that contains method to verify the Address Book activities of
+ *         My Account
  *
  */
 public class AddressBook {
-    
+
     public static final String COUNTRY_US = "United States";
     private TatchaTestHelper testHelper = new TatchaTestHelper();
     private final static Logger logger = Logger.getLogger(AddressBook.class);
@@ -41,7 +39,9 @@ public class AddressBook {
      * @param tcList
      * @throws Exception
      */
-    public void verifyAddressBook(WebDriver driver, Properties prop, Properties locator, List<TestCase> tcList) throws Exception {
+    public void verifyAddressBook(WebDriver driver, Properties prop, Properties locator, List<TestCase> tcList)
+            throws Exception {
+
         logger.info("BEGIN verifyAddressBook");
         String FUNCTIONALITY = "Verify address book of my account";
         testCase = new TestCase("TC-4.1", "MOC-NIL", FUNCTIONALITY, "FAIL", "");
@@ -50,16 +50,17 @@ public class AddressBook {
 
             // Assert Title
             WebElement webElement = driver.findElement(By.cssSelector("h1.text-center"));
-            assertEquals(prop.getProperty("myaccount.item4").toString(), webElement.getText());
+            getTestHelper().logAssertion(getClass().getSimpleName(), prop.getProperty("myaccount.item4").toString(), webElement.getText());
 
             // Assert Default address
             WebElement defaultAddressElement = driver
                     .findElement(By.xpath(locator.getProperty("address.default").toString()));
-            assertEquals(prop.getProperty("myaccount.item4.title2").toString(), defaultAddressElement.getText());
+            getTestHelper().logAssertion(getClass().getSimpleName(), prop.getProperty("myaccount.item4.title2").toString(), defaultAddressElement.getText());
 
             // Assert Add address
-            WebElement addAddressElement = driver.findElement(By.xpath(locator.getProperty("address.add").toString()));
-            assertEquals(prop.getProperty("myaccount.item4.title3").toString(), addAddressElement.getText());
+            WebElement addAddressElement = driver
+                    .findElement(By.xpath(locator.getProperty("address.add").toString()));
+            getTestHelper().logAssertion(getClass().getSimpleName(), prop.getProperty("myaccount.item4.title3").toString(), addAddressElement.getText());
 
             // Add Address to address book
             driver.findElement(By.xpath(locator.getProperty("address.add.button").toString())).click();
@@ -112,8 +113,10 @@ public class AddressBook {
      * @param locator
      * @param isEditDefaultAddress
      * @param tcList
+     * @throws Exception
      */
-    public void addAddress(WebDriver driver, Properties prop, Properties locator, boolean isEditDefaultAddress, List<TestCase> tcList) {
+    public void addAddress(WebDriver driver, Properties prop, Properties locator, boolean isEditDefaultAddress,
+            List<TestCase> tcList) throws Exception {
 
         logger.info("BEGIN addAddress");
         String FUNCTIONALITY = "Add address to address book";
@@ -125,9 +128,9 @@ public class AddressBook {
         if ("ADD ADDRESS".equalsIgnoreCase(title)) {
             isAddAddress = true;
         }
-        
+
         populateAddressBook(driver, prop, locator, isEditDefaultAddress, isAddAddress, tcList);
-        
+
         // Save address
         WebElement addAddressSaveButtonElement = driver
                 .findElement(By.xpath(locator.getProperty("addAddr.save.button").toString()));
@@ -146,10 +149,13 @@ public class AddressBook {
      * @param isEditDefaultAddress
      * @param isAddAddress
      * @param tcList
+     * @throws Exception
      */
     public String populateAddressBook(WebDriver driver, Properties prop, Properties locator,
-            boolean isEditDefaultAddress, boolean isAddAddress, List<TestCase> tcList) {
+            boolean isEditDefaultAddress, boolean isAddAddress, List<TestCase> tcList) throws Exception {
         logger.info("BEGIN populateAddressBook");
+        String addressId = null;
+
         String FUNCTIONALITY = "Populate the address fields";
         testCase = new TestCase("TC-4.3", "MOC-NIL", FUNCTIONALITY, "FAIL", "");
         WebDriverWait wait = (WebDriverWait) new WebDriverWait(driver, 5);
@@ -165,11 +171,12 @@ public class AddressBook {
         WebElement addAddr2Element = driver.findElement(By.xpath(locator.getProperty("addAddr.addr2").toString()));
         WebElement addAddrZipCodeElement = driver
                 .findElement(By.xpath(locator.getProperty("addAddr.zipCode").toString()));
-        WebElement addAddrPhoneElement = driver.findElement(By.xpath(locator.getProperty("addAddr.phone").toString()));
+        WebElement addAddrPhoneElement = driver
+                .findElement(By.xpath(locator.getProperty("addAddr.phone").toString()));
 
         // Get Address Id
         WebElement addressIdElement = driver.findElement(By.id("dwfrm_profile_address_addressid"));
-        String addressId = addressIdElement.getAttribute("value");
+        addressId = addressIdElement.getAttribute("value");
 
         // Populate first and last name
         addAddrFirstNameElement.clear();
@@ -197,43 +204,48 @@ public class AddressBook {
             addAddr2Element.clear();
             addAddr2Element.sendKeys(prop.getProperty("addressbook.addr2").toString());
         }
-        
+
         // Populate zip code and city
         addAddrZipCodeElement.clear();
         addAddrZipCodeElement.sendKeys(prop.getProperty("addressbook.pin").toString());
-        wait.until(ExpectedConditions.textToBePresentInElementValue(addAddrZipCodeElement, prop.getProperty("addressbook.pin").toString()));
-        
+        wait.until(ExpectedConditions.textToBePresentInElementValue(addAddrZipCodeElement,
+                prop.getProperty("addressbook.pin").toString()));
+
         WebElement addAddrStateElement = null;
         if (COUNTRY_US.equals(countryValue)) {
             addAddrStateElement = driver.findElement(By.xpath(locator.getProperty("addAddr.states").toString()));
-//            wait.until(ExpectedConditions.textToBePresentInElementValue(addAddrStateElement, prop.getProperty("addressbook.state").toString()));
+            // wait.until(ExpectedConditions.textToBePresentInElementValue(addAddrStateElement,
+            // prop.getProperty("addressbook.state").toString()));
             // Select State if country is US
             Select state = new Select(addAddrStateElement);
             if (!addAddrStateElement.isSelected()) {
                 state.selectByVisibleText(prop.getProperty("addressbook.state").toString());
             }
             try {
-                wait.until(ExpectedConditions.textToBePresentInElementValue(addAddrStateElement, prop.getProperty("addressbook.state").toString()));
-            } catch(TimeoutException te) {
+                wait.until(ExpectedConditions.textToBePresentInElementValue(addAddrStateElement,
+                        prop.getProperty("addressbook.state").toString()));
+            } catch (TimeoutException te) {
                 logger.info("Trying to select state again");
                 state.selectByVisibleText(prop.getProperty("addressbook.state").toString());
             }
         } else {
             addAddrStateElement = driver.findElement(By.xpath(locator.getProperty("addAddr.states").toString()));
-//            wait.until(ExpectedConditions.textToBePresentInElementValue(addAddrStateElement, prop.getProperty("addressbook.state").toString()));
-            if(addAddrStateElement.getAttribute("value").isEmpty()) {
+            // wait.until(ExpectedConditions.textToBePresentInElementValue(addAddrStateElement,
+            // prop.getProperty("addressbook.state").toString()));
+            if (addAddrStateElement.getAttribute("value").isEmpty()) {
                 // Enter state if country is not US
                 addAddrStateElement.clear();
                 addAddrStateElement.sendKeys(prop.getProperty("addressbook.state").toString());
             }
         }
-        
-        WebElement addAddrCityElement = driver.findElement(By.xpath(locator.getProperty("addAddr.city").toString()));
-        if(!COUNTRY_US.equals(countryValue) || addAddrCityElement.getAttribute("value").isEmpty()) {
+
+        WebElement addAddrCityElement = driver
+                .findElement(By.xpath(locator.getProperty("addAddr.city").toString()));
+        if (!COUNTRY_US.equals(countryValue) || addAddrCityElement.getAttribute("value").isEmpty()) {
             addAddrCityElement.clear();
             addAddrCityElement.sendKeys(prop.getProperty("addressbook.city").toString());
         }
-        
+
         if (isAddAddress) {
             // Populate phone no.
             addAddrPhoneElement.clear();
@@ -248,12 +260,12 @@ public class AddressBook {
                 }
             }
         }
-        
-        if(!COUNTRY_US.equals(countryValue) || addAddrCityElement.getAttribute("value").isEmpty()) {
+
+        if (!COUNTRY_US.equals(countryValue) || addAddrCityElement.getAttribute("value").isEmpty()) {
             addAddrCityElement.clear();
             addAddrCityElement.sendKeys(prop.getProperty("addressbook.city").toString());
         }
-        logger.info("Id of the Address added : "+addressId);
+        logger.info("Id of the Address added : " + addressId);
         testCase.setStatus("PASS");
         tcList.add(testCase);
         logger.info("END populateAddressBook");
@@ -267,27 +279,32 @@ public class AddressBook {
      * @param prop
      * @param locator
      * @param tcList
+     * @throws Exception
      */
-    public void removeAddress(WebDriver driver, Properties prop, Properties locator, List<TestCase> tcList) {
+    public void removeAddress(WebDriver driver, Properties prop, Properties locator, List<TestCase> tcList)
+            throws Exception {
+
         logger.info("BEGIN removeAddress");
         String FUNCTIONALITY = "Remove address from address book";
         testCase = new TestCase("TC-4.4", "MOC-NIL", FUNCTIONALITY, "FAIL", "");
         WebDriverWait wait = (WebDriverWait) new WebDriverWait(driver, 5);
-        WebElement removeIconElement = driver.findElement(By.xpath(locator.getProperty("address.remove").toString()));
+        WebElement removeIconElement = driver
+                .findElement(By.xpath(locator.getProperty("address.remove").toString()));
 
         // Click 'X' to delete address
         removeIconElement.click();
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(locator.getProperty("removeAddr.confirm.title").toString())));
+        wait.until(ExpectedConditions
+                .visibilityOfElementLocated(By.xpath(locator.getProperty("removeAddr.confirm.title").toString())));
 
         WebElement confirmModalDialogeTitleElement = driver
                 .findElement(By.xpath(locator.getProperty("removeAddr.confirm.title").toString()));
-        
+
         // Assert the title of dialogue box
-        assertEquals("ARE YOU SURE?", confirmModalDialogeTitleElement.getText());
+        getTestHelper().logAssertion(getClass().getSimpleName(), "ARE YOU SURE?", confirmModalDialogeTitleElement.getText());
         wait.until(ExpectedConditions.elementToBeClickable(By.linkText("DELETE")));
         WebElement confirmDeleteElement = driver
                 .findElement(By.cssSelector(locator.getProperty("removeAddr.confirm.button").toString()));
-              
+
         // Confirm delete address
         confirmDeleteElement.click();
         wait.until(ExpectedConditions.invisibilityOf(confirmModalDialogeTitleElement));
@@ -304,7 +321,8 @@ public class AddressBook {
     }
 
     /**
-     * @param loginHelper the loginHelper to set
+     * @param loginHelper
+     *            the loginHelper to set
      */
     public void setTestHelper(TatchaTestHelper testHelper) {
         this.testHelper = testHelper;

@@ -40,7 +40,6 @@ public class TatchaTestHelper {
             String authString = name + ":" + password;
             byte[] authEncBytes = Base64.encodeBase64(authString.getBytes());
             String authStringEnc = new String(authEncBytes);
-            System.out.println("Base64 encoded auth string: " + authStringEnc);
 
             URL url = new URL(webURL);
             URLConnection urlConnection = url.openConnection();

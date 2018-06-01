@@ -16,10 +16,7 @@ import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
-import org.openqa.selenium.NoAlertPresentException;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -40,9 +37,8 @@ import com.tatcha.jscripts.review.ReviewOrder;
 import com.tatcha.jscripts.summary.TestSummary;
 import com.tatcha.utils.BrowserDriver;
 
-
 /**
- * Flow-17: Add to cart - Login in Checkout page - Order Review(With US address) -
+ * Flow : Add to cart - Login in Checkout page - Order Review(With US address) -
  * Place order
  * 
  * @author Reshma
@@ -51,7 +47,6 @@ import com.tatcha.utils.BrowserDriver;
 public class ShoppingBagSamplesExpressCheckout {
 
     private WebDriver driver = BrowserDriver.getChromeWebDriver();
-    private boolean acceptNextAlert = true;
     private StringBuffer verificationErrors = new StringBuffer();
     private Properties prop = new Properties();
     private Properties locator = new Properties();
@@ -79,13 +74,10 @@ public class ShoppingBagSamplesExpressCheckout {
         if (testInLocal) {
             String url = data.getProperty("url").toString();
             driver.get(url);
-            getTestHelper().basicAuth(url);
-            driver.manage().window().maximize();
         } else {
             tmethods = TestMethods.getInstance();
             String baseUrl = tmethods.getBaseURL();
             driver.get(baseUrl);
-            driver.manage().window().maximize();
         }
     }
 
@@ -98,13 +90,13 @@ public class ShoppingBagSamplesExpressCheckout {
      */
     @Test
     public void testShoppingBagSamplesExpressCheckout() throws Exception {
-        String FUNCTIONALITY = "Express checkout with default US address and credit card";
-        testCase = new TestCase("Flow-1", "MOC-NIL", FUNCTIONALITY, "FAIL", "");
+        String FUNCTIONALITY = "Express checkout with a Product and Samples in cart";
+        testCase = new TestCase("Flow-17", "MOC-NIL", FUNCTIONALITY, "FAIL", "");
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy_HH:mm:ss");
         String timeStamp = sdf.format(Calendar.getInstance().getTime());
+        logger.info(getClass() + timeStamp);
 
-        logger.info("VERIFYING EXPRESS CHECKOUT FLOW FOR LOGGED IN USER WITH US ADDRESS : " + getClass() + timeStamp);
         ReviewOrder reviewOrder = new ReviewOrder();
         User user = new User();
         Map<String, Boolean> map = new HashMap<String, Boolean>();
@@ -169,18 +161,16 @@ public class ShoppingBagSamplesExpressCheckout {
         } catch (Exception exp) {
             try {
                 throw new TatchaException(exp, tcList);
-            } catch(Exception exe) {
-                logger.error(exe.toString());
+            } catch (Exception e) {
+                logger.error("Handling Tatcha Exception " + e.toString());
             }
-            logger.error("EXCEPTION", new Throwable(exp));
         }
-        
-		// Report Generation for Flow-17
-		if (ReportGenerator.getInstance().generateReport(MODULE, tcList))
-			logger.info("Report Generation Succeeded for: " + MODULE);
-		else
-			logger.info("Report Generation Failed for: " + MODULE);
-		
+        boolean generateReport = Boolean.parseBoolean(prop.getProperty("generateReport").toString());
+        if (generateReport && ReportGenerator.getInstance().generateReport(MODULE, tcList)) {
+            logger.info("Report Generation Succeeded for: " + MODULE);
+        } else {
+            logger.info("Report Generation Failed for: " + MODULE);
+        }
         logger.info("END testExpressCheckoutLoginUS");
     }
 
@@ -205,39 +195,6 @@ public class ShoppingBagSamplesExpressCheckout {
         String verificationErrorString = verificationErrors.toString();
         if (!"".equals(verificationErrorString)) {
             fail(verificationErrorString);
-        }
-    }
-
-    private boolean isElementPresent(By by) {
-        try {
-            driver.findElement(by);
-            return true;
-        } catch (NoSuchElementException e) {
-            return false;
-        }
-    }
-
-    private boolean isAlertPresent() {
-        try {
-            driver.switchTo().alert();
-            return true;
-        } catch (NoAlertPresentException e) {
-            return false;
-        }
-    }
-
-    private String closeAlertAndGetItsText() {
-        try {
-            Alert alert = driver.switchTo().alert();
-            String alertText = alert.getText();
-            if (acceptNextAlert) {
-                alert.accept();
-            } else {
-                alert.dismiss();
-            }
-            return alertText;
-        } finally {
-            acceptNextAlert = true;
         }
     }
 }

@@ -17,32 +17,30 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import com.tatcha.jscripts.bag.TestAddToCart;
 import com.tatcha.jscripts.commons.TestMethods;
-import com.tatcha.jscripts.confirmation.TestOrderConfirmation;
 import com.tatcha.jscripts.commons.ReportGenerator;
 import com.tatcha.jscripts.dao.TestCase;
 import com.tatcha.jscripts.dao.User;
 import com.tatcha.jscripts.exception.TatchaException;
 import com.tatcha.jscripts.helper.TatchaTestHelper;
 import com.tatcha.jscripts.login.TestLogin;
-import com.tatcha.jscripts.review.ReviewOrder;
+import com.tatcha.jscripts.myaccount.AddressBook;
+import com.tatcha.jscripts.myaccount.OrderHistory;
+import com.tatcha.jscripts.myaccount.ProfileSettings;
 import com.tatcha.utils.BrowserDriver;
 
 /**
- * Flow : Add to cart - Login in Checkout page - Order Review(With International
- * address) - Place order
+ * Flow : My Account
  * 
  * @author Reshma
  *
  */
-public class LoginExpressCheckoutDefaultInternational {
+public class LoginMyAccount {
 
     private WebDriver driver = BrowserDriver.getChromeWebDriver();
     private StringBuffer verificationErrors = new StringBuffer();
@@ -51,61 +49,60 @@ public class LoginExpressCheckoutDefaultInternational {
     private Properties data = new Properties();
 
     private TatchaTestHelper testHelper = new TatchaTestHelper();
-    private final static Logger logger = Logger.getLogger(LoginExpressCheckoutDefaultInternational.class);
+    private final static Logger logger = Logger.getLogger(LoginMyAccount.class);
 
     private static TestMethods tmethods;
     private TestCase testCase;
     private List<TestCase> tcList = new ArrayList<TestCase>();
-    private final String MODULE = "Flow-2 : LoginExpressCheckoutDefaultInternational";
+    private final String MODULE = "Flow-18 : LoginMyAccount";
 
     @Before
     public void setUp() throws Exception {
         prop.load(new FileInputStream(getClass().getResource("/tatcha.properties").getFile()));
-        locator.load(new FileInputStream(getClass().getResource("/checkoutElementLocator.properties").getFile()));
-        data.load(new FileInputStream(
-                getClass().getResource("/testFlows/LoginExpressCheckoutDefaultInternational.properties").getFile()));
+        locator.load(new FileInputStream(getClass().getResource("/myAccountElementLocator.properties").getFile()));
+        data.load(new FileInputStream(getClass().getResource("/testFlows/LoginMyAccount.properties").getFile()));
         driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 
         boolean testInLocal = Boolean.parseBoolean(prop.getProperty("testInLocal").toString());
         if (testInLocal) {
             String url = data.getProperty("url").toString();
             driver.get(url);
-            getTestHelper().basicAuth(url);
-            driver.manage().window().maximize();
         } else {
             tmethods = TestMethods.getInstance();
             String baseUrl = tmethods.getBaseURL();
             driver.get(baseUrl);
-            driver.manage().window().maximize();
         }
     }
 
     /**
      * Test the checkout flow of logged in user. Pre-requisite : The user should
      * have default shipping and payment details, and also the default address
-     * should be International address
+     * should be US
      * 
      * @throws Exception
      */
     @Test
-    public void testExpressCheckoutLoginInternational() throws Exception {
+    public void testLoginMyAccount() throws Exception {
 
-        String FUNCTIONALITY = "Express checkout with default international address and credit card";
-        testCase = new TestCase("Flow-2", "MOC-NIL", FUNCTIONALITY, "FAIL", "");
+        logger.info("BEGIN testLoginMyAccount");
+        String FUNCTIONALITY = "Login and verify My Account";
+        testCase = new TestCase("Flow-18", "MOC-NIL", FUNCTIONALITY, "FAIL", "");
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy_HH:mm:ss");
         String timeStamp = sdf.format(Calendar.getInstance().getTime());
-        logger.info(getClass()+ timeStamp);
-
-        ReviewOrder reviewOrder = new ReviewOrder();
+        logger.info(getClass() + timeStamp);
+        
         User user = new User();
-        Map<String, Boolean> map = new HashMap<String, Boolean>();
+        ProfileSettings profile = new ProfileSettings();
+        AddressBook address = new AddressBook();
+//        PaymentOptions payment = new PaymentOptions();
+        OrderHistory order = new OrderHistory();
 
-        TestAddToCart addToCart = new TestAddToCart();
         TestLogin testLogin = new TestLogin();
 
+        Map<String, Boolean> map = new HashMap<String, Boolean>();
         map.put("isLogged", true);
-        map.put("isUSAddress", false);
+        map.put("isUSAddress", true);
         map.put("isGiftCard", false);
         map.put("isCreditCard", true);
         map.put("isRegister", false);
@@ -113,27 +110,44 @@ public class LoginExpressCheckoutDefaultInternational {
         WebDriverWait wait = (WebDriverWait) new WebDriverWait(driver, 10);
 
         try {
-            addToCart.addSpecificProductToCart(driver, prop, locator, user, tcList);
 
-            wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("h2.panel-title")));
-            wait.until(ExpectedConditions
-                    .elementToBeClickable(By.xpath("//*[@id='cart-table']/div[2]/div/div[2]/button")));
+            try {
+                By closeButtonLocator = By.xpath("//*[@id='newsletterModal']/div/div/div[1]/button");
+                wait.until(ExpectedConditions
+                        .visibilityOfElementLocated(By.xpath("//*[@id='newsletterModal']/div/div/div[1]/h4")));
+                wait.until(ExpectedConditions.elementToBeClickable(closeButtonLocator));
+                // Click close button
+                driver.findElement(closeButtonLocator).click();
+                logger.info("Newsletter is present");
+                wait.until(ExpectedConditions
+                        .invisibilityOfElementLocated(By.xpath("//*[@id='newsletterModal']/div/div/div[1]/h4")));
 
-            // Click checkout button in shopping bag
-            Actions actions = new Actions(driver);
-            WebElement checkoutButtonElement = driver
-                    .findElement(By.xpath("//*[@id='cart-table']/div[2]/div/div[2]/button"));
-            actions.moveToElement(checkoutButtonElement).click(checkoutButtonElement);
-            actions.perform();
+            } catch (TimeoutException te) {
+                logger.info("Newsletter is NOT present");
+            }
+            
+            // User is logged in
+            testLogin.login(driver, data, locator, user, tcList);
+            logger.info("SUCCESSFULLY LOGGED-IN");
+            
+            // Assert and test profile settings in my account
+            profile.verifyProfileSettings(driver, prop, locator, data, user, tcList);
+            driver.findElement(By.xpath(locator.getProperty("account.back").toString())).click();
+            logger.info("Profile Settings done");
 
-            // Login as a registered user at the checkout
-            testLogin.checkoutLogin(driver, data, user, tcList);
+            // Assert and test address book in my account
+            address.verifyAddressBook(driver, prop, locator, tcList);
+            driver.findElement(By.xpath(locator.getProperty("account.back").toString())).click();
+            logger.info("Address Book done");
 
-            // Verify Review Order for express checkout
-            reviewOrder.verifyReviewOrder1(driver, prop, locator, user, map, tcList);
-
-            TestOrderConfirmation testConf = new TestOrderConfirmation();
-            testConf.verifyOrderConfirmation(driver, prop, locator, user, tcList);
+            // Assert and test payment options in my account - Cannot retrieve braintree fields
+//            payment.verifyPaymentOptions(driver, prop, locator);
+//            driver.findElement(By.xpath(locator.getProperty("account.back").toString())).click();
+            
+            // Assert and test order history in my account
+            order.verifyOrderHistory(driver, prop, locator, tcList);
+            driver.findElement(By.xpath(locator.getProperty("account.back").toString())).click();
+            logger.info("Order History done");
 
             testCase.setStatus("PASS");
             tcList.add(testCase);
@@ -150,7 +164,7 @@ public class LoginExpressCheckoutDefaultInternational {
         } else {
             logger.info("Report Generation Failed for: " + MODULE);
         }
-        logger.info("END testExpressCheckoutLoginInternational");
+        logger.info("END testLoginMyAccount");
     }
 
     /**
